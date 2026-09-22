@@ -1,0 +1,18 @@
+# TODO: Replace placeholders with approved GitHub usernames.
+/docs/ @kavindra-placeholder
+/shared/schemas/ @kavindra-placeholder
+/edge/provenance/ @kavindra-placeholder
+/cloud/verification/ @kavindra-placeholder
+/hardware/ @dhakshatha-placeholder
+/edge/sensors/ @dhakshatha-placeholder
+/edge/sensor_trust/ @dhakshatha-placeholder
+/ml/ @monhit-placeholder
+/edge/preprocessing/ @monhit-placeholder
+/edge/ai/ @monhit-placeholder
+/cloud/ @hari-placeholder
+/edge/connectivity/ @hari-placeholder
+/.github/workflows/ @hari-placeholder
+/dashboard/ @ashwarya-placeholder
+/tests/e2e/ @ashwarya-placeholder
+/docs/DEMO_SCRIPT.md @ashwarya-placeholder
+/docs/TEST_PLAN.md @ashwarya-placeholder

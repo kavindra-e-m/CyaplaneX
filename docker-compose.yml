@@ -1,0 +1,7 @@
+services:
+  mock-mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    profiles: [demo]
+  # TODO: Add local S3/Timestream-compatible services only after interfaces stabilize.

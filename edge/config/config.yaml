@@ -1,0 +1,6 @@
+device_id: edge-device-placeholder
+sampling:
+  vibration_hz: 1000
+  temperature_hz: 1
+  rpm_hz: 10
+# TODO: Replace demonstrator defaults through deployment configuration.

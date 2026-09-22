@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aerotrust.ai/schema/sensor-sample.json",
+  "title": "SensorSample",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["device_id", "sensor_id", "timestamp", "sequence", "sensor_type", "value", "unit", "calibration_version"],
+  "properties": {
+    "device_id": {"type": "string", "minLength": 1},
+    "sensor_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "sequence": {"type": "integer", "minimum": 0},
+    "sensor_type": {"type": "string"},
+    "value": {"type": "number"},
+    "unit": {"type": "string"},
+    "calibration_version": {"type": "string"}
+  }
+}
