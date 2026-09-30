@@ -1,1 +1,1 @@
-"""AeroTrust edge package."""
+"""CyaplaneX edge package."""

@@ -1,5 +1,5 @@
 {
-  "name": "aerotrust-dashboard",
+  "name": "cyaplanex-dashboard",
   "private": true,
   "version": "0.1.0",
   "scripts": {"check": "node --check src/index.js"},

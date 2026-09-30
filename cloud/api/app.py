@@ -1,4 +1,4 @@
-"""Lightweight, framework-neutral WSGI application for AeroTrust AI Verification API."""
+"""Lightweight, framework-neutral WSGI application for CyaplaneX Verification API."""
 from __future__ import annotations
 
 import json
@@ -18,7 +18,7 @@ from cloud.storage.store import get_default_store
 
 
 def wsgi_app(environ: dict[str, Any], start_response: Callable) -> list[bytes]:
-    """WSGI application handling AeroTrust verification and maintenance endpoints."""
+    """WSGI application handling CyaplaneX verification and maintenance endpoints."""
     path: str = environ.get("PATH_INFO", "/").rstrip("/") or "/"
     method: str = environ.get("REQUEST_METHOD", "GET").upper()
 
@@ -116,6 +116,6 @@ def wsgi_app(environ: dict[str, Any], start_response: Callable) -> list[bytes]:
 if __name__ == "__main__":
     from wsgiref.simple_server import make_server
     port = 8000
-    print(f"AeroTrust AI Verification API running on port {port}...")
+    print(f"CyaplaneX Verification API running on port {port}...")
     server = make_server("127.0.0.1", port, wsgi_app)
     server.serve_forever()

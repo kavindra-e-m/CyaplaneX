@@ -1,4 +1,4 @@
-"""AeroTrust AI — Complete Tata Technologies InnoVent 2026 End-to-End Demonstrator.
+"""CyaplaneX — Complete Tata Technologies InnoVent 2026 End-to-End Demonstrator.
 
 Executes the continuous 20-step lifecycle:
 Sense -> Validate Trust -> Predict -> Explain -> Sign -> Offline Buffer -> Sync ->
@@ -21,7 +21,7 @@ from edge.sensors.vibration import ReplayVibrationSensor
 
 def run_full_demo() -> None:
     print("=" * 72)
-    print("AEROTRUST AI — TATA TECHNOLOGIES INNOVENT 2026 DEMO SEQUENCE")
+    print("CYAPLANEX — TATA TECHNOLOGIES INNOVENT 2026 DEMO SEQUENCE")
     print("Closed-Loop Edge AI Predictive Maintenance & Cryptographic Provenance")
     print("=" * 72)
 

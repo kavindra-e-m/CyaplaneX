@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://aerotrust.ai/schema/sensor-sample.json",
+  "$id": "https://cyaplanex.ai/schema/sensor-sample.json",
   "title": "SensorSample",
   "type": "object",
   "additionalProperties": false,

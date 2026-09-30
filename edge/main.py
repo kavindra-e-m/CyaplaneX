@@ -1,4 +1,4 @@
-"""Edge application entry point executing the AeroTrust diagnostic cycle."""
+"""Edge application entry point executing the CyaplaneX diagnostic cycle."""
 from __future__ import annotations
 
 from edge.orchestrator import EdgePipelineOrchestrator
@@ -7,7 +7,7 @@ from edge.orchestrator import EdgePipelineOrchestrator
 def main() -> None:
     """Run an edge diagnostic cycle using the configured orchestrator."""
     print("==================================================")
-    print("AeroTrust AI — Edge Runtime Pipeline")
+    print("CyaplaneX — Edge Runtime Pipeline")
     print("Sense -> Trust -> Preprocess -> Predict -> Sign -> Dispatch")
     print("==================================================")
 

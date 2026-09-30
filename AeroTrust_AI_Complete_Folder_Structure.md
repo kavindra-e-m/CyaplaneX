@@ -1,4 +1,5 @@
-# AeroTrust AI — Complete Folder Structure
+# CyaplaneX — Complete Folder Structure
+*(Historical Reference: AeroTrust AI)*
 
 This file is the folder/file map for `kavindra-e-m/CyaplaneX`.
 

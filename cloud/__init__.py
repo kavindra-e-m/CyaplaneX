@@ -1,1 +1,1 @@
-"""AeroTrust cloud package."""
+"""CyaplaneX cloud package."""

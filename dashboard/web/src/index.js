@@ -4,4 +4,4 @@ const dashboardStates = [
   "REPAIR VERIFIED", "RE-INSPECTION REQUIRED"
 ];
 
-console.log(`AeroTrust dashboard scaffold states: ${dashboardStates.length}`);
+console.log(`CyaplaneX dashboard scaffold states: ${dashboardStates.length}`);

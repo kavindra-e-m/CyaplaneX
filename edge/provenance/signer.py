@@ -13,15 +13,16 @@ from typing import Any
 from edge.provenance.hashing import canonical_json, sha256_hex
 
 # Default local demonstrator signing secret; overridden by env or HSM reference in production
-DEFAULT_LOCAL_KEY_REF = "aerotrust-edge-dev-key-01"
+DEFAULT_LOCAL_KEY_REF = "cyaplanex-edge-dev-key-01"
 _LOCAL_KEY_STORE: dict[str, bytes] = {
-    DEFAULT_LOCAL_KEY_REF: b"aerotrust-prototype-device-secret-2026",
+    DEFAULT_LOCAL_KEY_REF: b"cyaplanex-prototype-device-secret-2026",
+    "aerotrust-edge-dev-key-01": b"cyaplanex-prototype-device-secret-2026",
 }
 
 
 def get_local_key(key_reference: str) -> bytes:
     """Resolve local key material from key reference or environment."""
-    env_key = os.environ.get("AEROTRUST_DEVICE_KEY")
+    env_key = os.environ.get("CYAPLANEX_DEVICE_KEY") or os.environ.get("AEROTRUST_DEVICE_KEY")
     if env_key:
         return env_key.encode("utf-8")
     if key_reference in _LOCAL_KEY_STORE:

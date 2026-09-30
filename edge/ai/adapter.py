@@ -24,7 +24,7 @@ class BaselineDemonstratorModel:
     Calculates physics-informed vibration and temperature anomaly scores.
     """
 
-    MODEL_ID = "aerotrust-baseline-eval-v1"
+    MODEL_ID = "cyaplanex-baseline-eval-v1"
     MODEL_VERSION = "1.0.0"
     MODEL_HASH = sha256_hex({"id": MODEL_ID, "version": MODEL_VERSION, "owner": "Monhit-Raju-ML"})
 

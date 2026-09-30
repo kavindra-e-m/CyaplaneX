@@ -16,7 +16,7 @@ def get_default_queue() -> OfflineQueue:
 def sync_pending(
     queue: OfflineQueue | None = None,
     transport: CloudTransport | None = None,
-    topic: str = "aerotrust/events/maintenance",
+    topic: str = "cyaplanex/events/maintenance",
     batch_size: int = 50,
 ) -> int:
     """Drain queued events and synchronize them across the transport.
@@ -52,7 +52,7 @@ class SyncCoordinator:
         self.queue = queue
         self.transport = transport
 
-    def handle_event(self, event: dict[str, Any], topic: str = "aerotrust/events/maintenance") -> dict[str, Any]:
+    def handle_event(self, event: dict[str, Any], topic: str = "cyaplanex/events/maintenance") -> dict[str, Any]:
         """Dispatch event immediately if online, otherwise buffer locally."""
         if self.transport.is_connected():
             sent = self.transport.send(topic, event)
@@ -63,7 +63,7 @@ class SyncCoordinator:
         self.queue.put(event)
         return {"status": "OFFLINE_BUFFERED", "queue_depth": len(self.queue)}
 
-    def synchronize(self, topic: str = "aerotrust/events/maintenance", batch_size: int = 100) -> dict[str, Any]:
+    def synchronize(self, topic: str = "cyaplanex/events/maintenance", batch_size: int = 100) -> dict[str, Any]:
         """Synchronize buffered records upon connectivity restoration."""
         initial_depth = len(self.queue)
         synced = sync_pending(queue=self.queue, transport=self.transport, topic=topic, batch_size=batch_size)
