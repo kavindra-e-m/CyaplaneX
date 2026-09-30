@@ -130,6 +130,7 @@ def test_edge_ml_adapter_with_production_model() -> None:
 
 
 def test_onnx_production_model_inference() -> None:
+    pytest.importorskip("onnxruntime")
     from ml.export.onnx_model import CyaplaneXONNXModel
     onnx_model = CyaplaneXONNXModel()
 
