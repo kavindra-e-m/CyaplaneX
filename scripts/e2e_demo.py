@@ -21,8 +21,9 @@ from edge.sensors.vibration import ReplayVibrationSensor
 
 def run_full_demo() -> None:
     print("=" * 72)
-    print("CYAPLANEX — TATA TECHNOLOGIES INNOVENT 2026 DEMO SEQUENCE")
+    print("CYAPLANEX -- TATA TECHNOLOGIES INNOVENT 2026 DEMO SEQUENCE")
     print("Closed-Loop Edge AI Predictive Maintenance & Cryptographic Provenance")
+    print("Operating Mode: SIMULATED TESTBED TELEMETRY (Physical HIL Pending)")
     print("=" * 72)
 
     # Step 1: Start the system
@@ -122,7 +123,7 @@ def run_full_demo() -> None:
         print(f"         - [{r['record_type']}] Timestamp={r['timestamp'][:19]} | Detail={r.get('condition') or r.get('action')}")
 
     print("\n" + "=" * 72)
-    print("DEMO COMPLETE — FULL CLOSED-LOOP CYCLE REPRODUCIBLY VERIFIED!")
+    print("DEMO COMPLETE -- FULL CLOSED-LOOP CYCLE REPRODUCIBLY VERIFIED!")
     print("=" * 72)
 
 
