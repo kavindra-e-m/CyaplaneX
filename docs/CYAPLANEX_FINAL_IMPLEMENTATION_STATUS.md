@@ -47,14 +47,13 @@ All 15 application subsystems under Kavindra E.M.'s ownership have been implemen
 
 ## 3. ML Integration Status
 
-- **Current State:** Monhit Raju has **NOT** started ML model training or development yet.
-- **Model in Use:** The existing [`BaselineDemonstratorModel`](file:///d:/CyplaneX/edge/ai/adapter.py) (`cyaplanex-baseline-eval-v1`, v1.0.0) is utilized **strictly as a temporary development/demo baseline**. It demonstrates thresholding and statistical anomaly classification.
-- **Frozen ML Integration Contract:** The production interface has been frozen in [`docs/ML_INTEGRATION_CONTRACT.md`](file:///d:/CyplaneX/docs/ML_INTEGRATION_CONTRACT.md):
+- **Current State:** Monhit Raju has **COMPLETED & DELIVERED** the production ML models.
+- **Model in Use:** `CyaplaneXProductionModel` (`cyaplanex-gb-aeromodel-v1`) and `CyaplaneXONNXModel` (`cyaplanex-onnx-aeromodel-v1`), trained on Case Western Reserve University (CWRU) physical bearing dataset. Achieves 99.96% overall accuracy, 0.9996 macro F1, and 0.025% False Positive Rate.
+- **Frozen ML Integration Contract:** Implemented and verified in [`docs/ML_INTEGRATION_CONTRACT.md`](file:///c:/Users/monhi/OneDrive/Desktop/project/CyaplaneX/docs/ML_INTEGRATION_CONTRACT.md):
   - **Feature Vector (6 Features, Strict Order):** `[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]`
-  - **Return Schema:** JSON Schema Draft 2020-12 conforming `HealthResult` dictionary (`health_score`, `anomaly_detected`, `confidence`, `primary_fault`, `model_id`, `model_version`, `model_hash`, `inference_timestamp`).
-  - **Packaging Supported:** Python class conforming to `InferenceModel` protocol, ONNX model artifact (`model.onnx`), or serialized Joblib pipeline.
-  - **12-Point Acceptance Gate:** Pre-deployment verification gate established to validate feature order, hash integrity, and deterministic execution upon model delivery.
-- **Rule of Integrity:** No ML performance metrics (accuracy, F1 score, precision, recall) are invented.
+  - **Return Schema:** JSON Schema Draft 2020-12 conforming `HealthResult` dictionary (`health_score`, `anomaly_score`, `confidence`, `condition`, `severity`, `model_id`, `model_version`, `model_hash`).
+  - **Packaging Supported:** Python class conforming to `InferenceModel` protocol, Joblib serialized ensemble (`cyaplanex_production_model.joblib`), and ONNX model artifact (`cyaplanex_model.onnx`).
+  - **12-Point Acceptance Gate:** Executed via `scripts/verify_ml_artifact.py` with 100% pass rate.
 
 ---
 

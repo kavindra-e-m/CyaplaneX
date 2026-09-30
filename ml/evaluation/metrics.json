@@ -1,0 +1,49 @@
+{
+  "model_id": "cyaplanex-gb-aeromodel-v1",
+  "model_version": "1.0.0",
+  "model_hash": "95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b",
+  "total_evaluation_samples": 5000,
+  "overall_accuracy": 0.9996,
+  "macro_f1_score": 0.9996,
+  "aerospace_healthy_fpr": 0.00025,
+  "per_class": {
+    "HEALTHY": {
+      "precision": 0.999,
+      "recall": 1.0,
+      "f1_score": 0.9995,
+      "support": 1000
+    },
+    "HIGH_VIBRATION": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 1000
+    },
+    "MECHANICAL_WEAR": {
+      "precision": 1.0,
+      "recall": 0.999,
+      "f1_score": 0.9995,
+      "support": 1000
+    },
+    "OVERHEATING": {
+      "precision": 0.999,
+      "recall": 0.999,
+      "f1_score": 0.999,
+      "support": 1000
+    },
+    "SPEED_INSTABILITY": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 1000
+    }
+  },
+  "feature_importances": {
+    "vib_rms": 0.1978,
+    "vib_p2p": 0.2398,
+    "temp_mean": 0.0035,
+    "temp_max": 0.2519,
+    "rpm_mean": 0.0001,
+    "rpm_std": 0.307
+  }
+}

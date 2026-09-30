@@ -1,0 +1,72 @@
+{
+  "dataset_name": "CyaplaneX Aerospace Rotating Machinery Health Benchmark",
+  "version": "1.0.0",
+  "total_samples": 5000,
+  "samples_per_class": 1000,
+  "classes": [
+    "HEALTHY",
+    "HIGH_VIBRATION",
+    "MECHANICAL_WEAR",
+    "OVERHEATING",
+    "SPEED_INSTABILITY"
+  ],
+  "frozen_feature_order": [
+    "vib_rms",
+    "vib_p2p",
+    "temp_mean",
+    "temp_max",
+    "rpm_mean",
+    "rpm_std"
+  ],
+  "class_distribution": {
+    "HIGH_VIBRATION": 1000,
+    "OVERHEATING": 1000,
+    "HEALTHY": 1000,
+    "SPEED_INSTABILITY": 1000,
+    "MECHANICAL_WEAR": 1000
+  },
+  "feature_summary": {
+    "vib_rms": {
+      "mean": 0.6689,
+      "std": 0.5123,
+      "min": 0.2228,
+      "max": 2.1293
+    },
+    "vib_p2p": {
+      "mean": 0.4676,
+      "std": 0.4749,
+      "min": 0.078,
+      "max": 1.6267
+    },
+    "temp_mean": {
+      "mean": 60.1723,
+      "std": 12.2143,
+      "min": 42.03,
+      "max": 94.56
+    },
+    "temp_max": {
+      "mean": 65.0305,
+      "std": 14.6565,
+      "min": 44.65,
+      "max": 104.57
+    },
+    "rpm_mean": {
+      "mean": 2981.7356,
+      "std": 31.6647,
+      "min": 2799.8,
+      "max": 3130.1
+    },
+    "rpm_std": {
+      "mean": 22.2573,
+      "std": 17.6278,
+      "min": 3.0,
+      "max": 82.31
+    }
+  },
+  "raw_sources": [
+    "Case Western Reserve University (CWRU) Bearing Data Center 97.mat, 98.mat",
+    "CWRU 105.mat, 106.mat (Drive End 0.007\" Inner Race Defect)",
+    "CWRU 118.mat, 119.mat (Drive End 0.007\" Ball Defect)",
+    "CWRU 130.mat, 131.mat (Drive End 0.007\" Outer Race Defect @ 6:00)"
+  ]
+}

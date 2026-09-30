@@ -1,0 +1,21 @@
+{
+  "model_id": "cyaplanex-onnx-aeromodel-v1",
+  "model_version": "1.0.0",
+  "model_hash": "74c7fd44d5f74cc4f7ea247465c2bd218e5678e15aed018d8d7fddc85976056a",
+  "classes": [
+    "HEALTHY",
+    "HIGH_VIBRATION",
+    "MECHANICAL_WEAR",
+    "OVERHEATING",
+    "SPEED_INSTABILITY"
+  ],
+  "input_features": [
+    "vib_rms",
+    "vib_p2p",
+    "temp_mean",
+    "temp_max",
+    "rpm_mean",
+    "rpm_std"
+  ],
+  "test_accuracy": 1.0
+}

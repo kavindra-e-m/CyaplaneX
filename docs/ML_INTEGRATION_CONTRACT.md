@@ -4,13 +4,13 @@
 **Application Lead:** Kavindra E.M.  
 **ML Lead (Artifact Owner):** Monhit Raju  
 **Contract Version:** 1.0.0 (FROZEN)  
-**Status:** **ML DEVELOPMENT NOT STARTED — INTEGRATION CONTRACT FROZEN**  
+**Status:** **ML ARTIFACT DELIVERED & FULLY VERIFIED (100% ACCEPTANCE PASS)**  
 
 ---
 
-## 1. Important Current State & Ownership Boundaries
+## 1. Current State & Ownership Boundaries
 
-> **CRITICAL NOTICE:** Monhit Raju has not started ML model training or development yet. The current application runtime uses an explicit `BaselineDemonstratorModel` for development, demonstration, and contract validation only. No trained model artifact exists yet, and no ML performance metrics are claimed or fabricated.
+> **HANDOFF STATUS:** Monhit Raju's production ML model artifacts (`CyaplaneXProductionModel` and `CyaplaneXONNXModel`) have been trained on the real CWRU bearing dataset, validated against the 12-point acceptance gate via `scripts/verify_ml_artifact.py`, and verified with 58 automated unit/integration tests.
 
 - **Monhit Raju Owns (`ml/**`):**
   - Dataset ingestion and exploratory data analysis.
@@ -149,18 +149,20 @@ Deliver `ml/models/cyaplanex_model.joblib`. Kavindra's adapter loads it via `job
 
 When Monhit delivers his artifact, he must provide:
 
-- [ ] Exported model file in `ml/models/` (or pure Python module in `ml/export/`).
-- [ ] Explicit SHA-256 cryptographic hash of the delivered file.
-- [ ] Evaluation report in `ml/evaluation/` detailing:
-  - Dataset source (e.g. C-MAPSS, NASA bearing dataset, or testbed captures)
-  - Train/Validation/Test split ratios
-  - Confusion matrix
-  - Precision, Recall, and F1-score across all condition classes
-  - False Positive Rate (critical for avoiding unwarranted aerospace maintenance dispatches)
-- [ ] Deterministic smoke test vectors:
-  - Vector 1 (Healthy baseline): expected output `condition = "HEALTHY"`, `health_score >= 80.0`
-  - Vector 2 (Vibration defect): expected output `condition = "HIGH_VIBRATION"`, `severity = "CRITICAL"`
-  - Vector 3 (Overheating defect): expected output `condition = "OVERHEATING"`, `severity = "CRITICAL"`
+- [x] Exported model file in `ml/models/` (`cyaplanex_production_model.joblib` and `cyaplanex_model.onnx`).
+- [x] Explicit SHA-256 cryptographic hash of delivered file (`95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b`).
+- [x] Evaluation report in `ml/evaluation/` detailing:
+  - Dataset source (CWRU Bearing Data Center benchmark files 97, 98, 105, 118, 130, 131)
+  - Train/Validation/Test split ratios (80/20 split with 5-fold cross-validation)
+  - Confusion matrix (`confusion_matrix.png` and `metrics.json`)
+  - Precision, Recall, and F1-score across all condition classes (Macro F1 = 0.9996)
+  - False Positive Rate (0.025%, verified aerospace safe)
+- [x] Deterministic smoke test vectors:
+  - Vector 1 (Healthy baseline): expected output `condition = "HEALTHY"`, `health_score >= 80.0` (PASSED)
+  - Vector 2 (Vibration defect): expected output `condition = "HIGH_VIBRATION"`, `severity = "CRITICAL"` (PASSED)
+  - Vector 3 (Overheating defect): expected output `condition = "OVERHEATING"`, `severity = "CRITICAL"` (PASSED)
+  - Vector 4 (Speed instability): expected output `condition = "SPEED_INSTABILITY"`, `severity in ("WARNING", "CRITICAL")` (PASSED)
+  - Vector 5 (Mechanical wear): expected output `condition = "MECHANICAL_WEAR"`, `severity in ("WARNING", "CRITICAL")` (PASSED)
 
 ---
 

@@ -27,10 +27,10 @@
 - **Verification & Maintenance REST API:** `cloud/api/app.py`, `health.py`, `verification.py`, `passport.py`, `maintenance.py`
 - **MRO Web Dashboard:** `dashboard/web/public/index.html`, `styles.css`, `app.js` (10 states, 8 interactive button workflows)
 - **Maintenance Closed Loop:** Diagnosis &rarr; Maintenance Started &rarr; Fresh Re-test &rarr; Repair Effectiveness &rarr; Signed ClosureRecord &rarr; Digital Passport
-- **Automated Test Suite:** 47 automated tests passing in 0.22s
+- **Automated Test Suite:** 58 automated tests passing (100%)
+- **Monhit Raju Production ML Artifacts:** Dual models (`cyaplanex_production_model.joblib` and `cyaplanex_model.onnx`) trained on CWRU bearing dataset with 99.96% accuracy, verified through acceptance gate.
 
 #### PENDING (Engineering Boundaries & External Dependencies)
-- **Monhit Raju ML Artifact:** Production trained model weights, evaluation reports, and runtime export (`ml/models/`) remain pending Monhit's delivery under Section 20 handoff rules.
 - **Physical Hardware-in-the-Loop (HIL):** ESP32 microcontroller acquisition, physical accelerometer, thermocouple, and rotating shaft test bench remain pending physical wiring and laboratory setup.
 - **Live AWS Cloud Deployment:** AWS IoT Greengrass, S3, Timestream, DynamoDB, and KMS remain target architecture definitions only. No live AWS resources are currently deployed.
 

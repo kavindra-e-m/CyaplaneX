@@ -32,6 +32,7 @@ class EdgePipelineOrchestrator:
         component_id: str = "bearing-thrust-01",
         transport: CloudTransport | None = None,
         queue: OfflineQueue | None = None,
+        model: Any | None = None,
     ) -> None:
         self.device_id = device_id
         self.asset_id = asset_id
@@ -41,7 +42,16 @@ class EdgePipelineOrchestrator:
         self.acquisition = SensorAcquisitionService(device_id=device_id)
         self.trust_engine = SensorTrustEngine()
         self.feature_pipeline = FeaturePipeline()
-        self.ml_adapter = EdgeMLAdapter()
+        if model is None:
+            try:
+                from ml.export.model import ProductionModel
+                resolved_model = ProductionModel()
+            except (ImportError, OSError, ValueError):
+                resolved_model = None
+        else:
+            resolved_model = model
+
+        self.ml_adapter = EdgeMLAdapter(model=resolved_model)
         self.reasoning_engine = MaintenanceReasoningEngine()
         self.signer = DeviceLocalSigner()
 
