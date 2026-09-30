@@ -1,6 +1,8 @@
 """Unit tests for preprocessing feature pipeline and Edge ML adapter."""
 from datetime import UTC, datetime
 
+import pytest
+
 from edge.ai.adapter import EdgeMLAdapter
 from edge.preprocessing.pipeline import FeaturePipeline
 from shared.contracts import HealthSeverity, SchemaName, validate_contract
@@ -32,6 +34,13 @@ def test_edge_ml_adapter_evaluates_healthy_condition() -> None:
     adapter = EdgeMLAdapter()
     # Features: [vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]
     healthy_features = [0.35, 0.1, 50.0, 52.0, 3000.0, 10.0]
+
+    # Verify frozen 6-feature contract rejects invalid lengths
+    with pytest.raises(ValueError, match="Frozen ML contract violation"):
+        adapter.infer([0.35, 0.1, 50.0, 52.0, 3000.0])
+
+    with pytest.raises(ValueError, match="Frozen ML contract violation"):
+        adapter.infer([0.35, 0.1, 50.0, 52.0, 3000.0, 10.0, 99.0])
 
     result = adapter.infer(healthy_features)
 
