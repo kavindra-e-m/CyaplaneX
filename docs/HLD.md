@@ -1,13 +1,16 @@
-# High-Level Design
+# High-Level Design (HLD) — CyaplaneX
 
 ## Scope
-AeroTrust AI is a trusted closed-loop Edge AI demonstrator. The architecture separates sensor acquisition, sensor trust, edge intelligence, provenance, connectivity, cloud verification, and MRO workflow.
+CyaplaneX is a trusted closed-loop Edge AI predictive maintenance demonstrator for aerospace engineering. The architecture strictly separates sensor acquisition, sensor trust, edge intelligence, provenance, connectivity, local/cloud verification, and MRO workflow.
 
-## Data path
-Sensors -> trust checks -> preprocessing/fusion -> model adapters -> maintenance reasoning -> local provenance -> offline queue -> AWS IoT -> S3/Timestream/KMS -> verification API -> dashboard -> repair retest -> closure record.
+## Data Path
+Sensors -> Sensor Trust -> Preprocessing/Fusion -> Model Adapters -> Maintenance Reasoning -> Local Provenance (HMAC-SHA256) -> Offline Queue -> Cloud Transport -> Verification API -> Evidence Store -> MRO Dashboard -> Repair Re-test -> Closure Record -> Digital Passport.
 
-## Security posture
-The edge signs locally and remains functional without AWS availability. Cloud KMS is reserved for governance and supported cloud cryptographic workflows. Sequence, timestamp, nonce, sensor-window hash, model metadata, and previous-record hash are evidence fields. This scaffold is tamper-evident and cryptographically verifiable in intent; production cryptography and key custody remain TODO.
+## Infrastructure Status
+- **IMPLEMENTED LOCALLY:** In-memory evidence store, local WSGI REST API server, cryptographic verifier, and offline synchronization coordinator.
+- **TARGET AWS ARCHITECTURE:** AWS IoT Greengrass v2 (edge runtime), AWS IoT Core (MQTT broker), Amazon S3 (evidence archive), Amazon Timestream (telemetry metrics), and AWS KMS (cloud key management).
+- **LIVE AWS DEPLOYMENT:** PENDING / NOT DEPLOYED. Local demonstrator operates independently without requiring live AWS infrastructure.
 
-## AWS extension points
-Greengrass, IoT Core, S3, Timestream, KMS are the core path. DynamoDB, Lambda, API Gateway, EventBridge, SNS, SiteWise, Grafana, and TwinMaker are future integrations.
+## Security Posture
+The edge signs evidence locally via device-local HMAC-SHA256 and remains functional without cloud connectivity. Cloud KMS is reserved for cloud-side key governance. Monotonic sequence, timestamp, nonce, sensor-window hash, model metadata, and previous-record hash guarantee cryptographically verifiable and tamper-evident lineage.
+

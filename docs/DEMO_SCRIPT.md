@@ -1,9 +1,9 @@
-# AeroTrust AI — Demo Script & Verification Guide
+# CyaplaneX — Demo Script & Verification Guide
 
 **Tata Technologies InnoVent 2026**  
 **Category:** Edge AI for Predictive Maintenance & Aircraft Health Monitoring
 
-This document details the exact commands and verifiable sequence to reproduce the complete closed-loop maintenance demonstration for AeroTrust AI.
+This document details the exact commands and verifiable sequence to reproduce the complete closed-loop maintenance demonstration for CyaplaneX.
 
 ---
 
@@ -74,4 +74,4 @@ The dashboard provides visual telemetry, sensor trust diagnostics, provenance ve
 
 ## 4. Engineering Scope and Disclaimer
 
-AeroTrust AI is an engineering demonstrator and prototype developed for the Tata Technologies InnoVent 2026 competition. It demonstrates verifiable edge intelligence, cryptographic provenance, and closed-loop maintenance workflows. It is not an operational flight release or aircraft-certified software.
+CyaplaneX is an engineering demonstrator and prototype developed for the Tata Technologies InnoVent 2026 competition. It demonstrates verifiable edge intelligence, cryptographic provenance, and closed-loop maintenance workflows. It is not an operational flight release or aircraft-certified software.

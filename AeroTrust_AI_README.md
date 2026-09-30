@@ -1,9 +1,10 @@
-# AeroTrust AI
+# CyaplaneX
 
-> **Trusted Closed-Loop Edge Intelligence for Aerospace Predictive Maintenance**  
+> **CyaplaneX — Trusted Closed-Loop Edge Intelligence for Aerospace Predictive Maintenance**  
+> *(Historical Project Codename: AeroTrust AI)*  
 > **Sense → Validate → Fuse → Predict → Explain → Sign → Verify → Repair → Re-test → Close**
 
-AeroTrust AI is an Edge AI-based predictive-maintenance platform for aerospace component health monitoring. It validates sensor reliability, performs local multi-sensor health inference, explains why maintenance is required, cryptographically secures the maintenance evidence, synchronizes securely with AWS, verifies provenance, and finally re-tests the component after maintenance to confirm that the repair was effective.
+CyaplaneX is an Edge AI-based predictive-maintenance platform for aerospace component health monitoring. It validates sensor reliability, performs local multi-sensor health inference, explains why maintenance is required, cryptographically secures the maintenance evidence, synchronizes securely with cloud infrastructure when available, verifies provenance, and finally re-tests the component after maintenance to confirm that the repair was effective.
 
 ---
 
@@ -13,7 +14,7 @@ Conventional predictive-maintenance systems often focus only on detecting a faul
 
 `Sensor → AI → Fault`
 
-AeroTrust AI addresses a broader trust problem:
+CyaplaneX addresses a broader trust problem:
 
 1. **Can the sensor data itself be trusted?**
 2. **Can the AI detect and explain the fault locally?**

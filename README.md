@@ -1,19 +1,20 @@
-# AeroTrust AI
+# CyaplaneX
 
-Trusted closed-loop Edge AI predictive maintenance for aerospace engineering demonstrators.
+**Tata Technologies InnoVent 2026**  
+**Category:** Edge AI for Predictive Maintenance & Aircraft Health Monitoring  
 
-## Problem and solution
-AeroTrust AI validates sensor trust before inference, performs local health intelligence, explains maintenance decisions, signs evidence offline, synchronizes through AWS when available, verifies provenance, and closes the loop with repair-effectiveness testing.
+> **CyaplaneX — Trusted Edge AI Predictive Maintenance & Maintenance Provenance**  
+> *(Prototyped under the historical working title AeroTrust AI during initial scaffolding).*
 
-Core flow: **Sense -> Validate -> Fuse -> Predict -> Explain -> Sign -> Sync -> Verify -> Maintain -> Re-test -> Close**.
+---
 
-## Problem and solution
-AeroTrust AI validates sensor trust before inference, performs local health intelligence, explains maintenance decisions, signs evidence offline, synchronizes through cloud transport when available, verifies provenance, and closes the loop with repair-effectiveness testing.
+## Problem and Solution
+CyaplaneX validates sensor trust before inference, performs local health intelligence, explains maintenance decisions, signs evidence offline, synchronizes through cloud transport when available, verifies provenance, and closes the loop with repair-effectiveness testing.
 
 Core flow: **Sense -> Validate -> Fuse -> Predict -> Explain -> Sign -> Sync -> Verify -> Maintain -> Re-test -> Close**.
 
 ### Current Project Status
-> **Local end-to-end software demonstrator completed and verified; physical HIL, trained production model handoff and live AWS deployment remain pending.**
+> **"CyaplaneX local end-to-end software demonstrator completed and verified; physical HIL validation, trained ML artifact handoff and live AWS deployment remain pending."**
 
 ---
 
