@@ -88,3 +88,27 @@ def test_sensor_acquisition_unregistered_sensor_raises() -> None:
     service = SensorAcquisitionService()
     with pytest.raises(KeyError, match="not registered"):
         service.acquire_sample("nonexistent-sensor")
+
+
+def test_serial_stream_sensor_reader() -> None:
+    from edge.sensors.physical import SerialStreamSensorReader
+
+    reader = SerialStreamSensorReader(sensor_id="vib-phys-01", default_fallback=0.35)
+    assert reader.read() == 0.35
+
+    # Feed CSV telemetry packet
+    reader.feed_line("vib-phys-01,0.58")
+    assert reader.read() == 0.58
+
+    # Feed JSON telemetry packet
+    reader.feed_line('{"sensor_id": "vib-phys-01", "value": 1.45}')
+    assert reader.read() == 1.45
+
+    # Integrate into SensorAcquisitionService
+    service = SensorAcquisitionService(device_id="hil-edge-01")
+    service.register_sensor("vib-phys-01", "vibration", "g", "cal-esp32-v1", reader)
+    sample = service.acquire_sample("vib-phys-01")
+    assert sample["sensor_id"] == "vib-phys-01"
+    valid, err = validate_contract(sample, SchemaName.SENSOR_SAMPLE)
+    assert valid, err
+
