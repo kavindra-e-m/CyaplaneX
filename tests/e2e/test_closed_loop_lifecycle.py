@@ -1,4 +1,4 @@
-"""End-to-End integration test of the AeroTrust AI closed-loop lifecycle.
+"""End-to-End integration test of the CyaplaneX closed-loop lifecycle.
 
 Sense -> Validate -> Fuse -> Predict -> Explain -> Sign -> Sync -> Verify -> Maintain -> Re-test -> Close -> Passport.
 """

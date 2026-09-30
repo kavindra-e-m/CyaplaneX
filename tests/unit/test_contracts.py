@@ -40,7 +40,7 @@ def sample_health_payload() -> dict:
         "health_score": 95.0,
         "confidence": 0.92,
         "severity": "HEALTHY",
-        "model_id": "aerotrust-anomaly-v1",
+        "model_id": "cyaplanex-anomaly-v1",
         "model_version": "1.0.0",
         "model_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     }
