@@ -1,8 +1,9 @@
-"""Lightweight, framework-neutral WSGI application for CyaplaneX Verification API."""
+"""Lightweight, framework-neutral WSGI application for CyaplaneX Verification API & Dashboard."""
 from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from cloud.api.health import get_health
@@ -16,11 +17,34 @@ from cloud.api.passport import get_passport
 from cloud.api.verification import ingest_and_verify, verification_status
 from cloud.storage.store import get_default_store
 
+STATIC_DIR = Path(__file__).resolve().parent.parent.parent / "dashboard" / "web" / "public"
+
 
 def wsgi_app(environ: dict[str, Any], start_response: Callable) -> list[bytes]:
-    """WSGI application handling CyaplaneX verification and maintenance endpoints."""
+    """WSGI application handling CyaplaneX verification, maintenance, and dashboard assets."""
     path: str = environ.get("PATH_INFO", "/").rstrip("/") or "/"
     method: str = environ.get("REQUEST_METHOD", "GET").upper()
+
+    # Serve static dashboard assets
+    if method == "GET":
+        file_map = {
+            "/": ("index.html", "text/html; charset=utf-8"),
+            "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/styles.css": ("styles.css", "text/css; charset=utf-8"),
+            "/app.js": ("app.js", "application/javascript; charset=utf-8"),
+        }
+        if path in file_map:
+            filename, ctype = file_map[path]
+            file_path = STATIC_DIR / filename
+            if file_path.is_file():
+                content = file_path.read_bytes()
+                headers = [
+                    ("Content-Type", ctype),
+                    ("Content-Length", str(len(content))),
+                    ("Access-Control-Allow-Origin", "*"),
+                ]
+                start_response("200 OK", headers)
+                return [content]
 
     def respond(status: str, data: Any) -> list[bytes]:
         body = json.dumps(data).encode("utf-8")
@@ -114,8 +138,14 @@ def wsgi_app(environ: dict[str, Any], start_response: Callable) -> list[bytes]:
 
 
 if __name__ == "__main__":
+    import os
     from wsgiref.simple_server import make_server
-    port = 8000
-    print(f"CyaplaneX Verification API running on port {port}...")
-    server = make_server("127.0.0.1", port, wsgi_app)
+
+    port = int(os.environ.get("PORT", "8000"))
+    print("=" * 72)
+    print("CyaplaneX Server (API + MRO Dashboard) running...")
+    print(f"Web Dashboard URL: http://localhost:{port}/")
+    print(f"Health API URL:    http://localhost:{port}/health")
+    print("=" * 72)
+    server = make_server("0.0.0.0", port, wsgi_app)
     server.serve_forever()
