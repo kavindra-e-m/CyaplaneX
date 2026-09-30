@@ -1,6 +1,7 @@
-# AeroTrust AI — Final Technical Audit & Evidence Reconciliation
+# CyaplaneX — Final Technical Audit & Evidence Reconciliation
 
-**Project:** AeroTrust AI (Tata Technologies InnoVent 2026)  
+**Project:** CyaplaneX (Tata Technologies InnoVent 2026)  
+*(Historical Project Codename: AeroTrust AI)*  
 **Lead Application Engineer / Architect:** Kavindra E.M.  
 **ML Lead (Artifact Boundary):** Monhit Raju  
 **Audit Date:** 2026-09-30  
@@ -10,9 +11,9 @@
 
 ## 1. Executive Summary & Canonical Project Status
 
-> **"Local end-to-end software demonstrator completed and verified; physical HIL, trained production model handoff and live AWS deployment remain pending."**
+> **"CyaplaneX local end-to-end software demonstrator completed and verified; physical HIL validation, trained ML artifact handoff and live AWS deployment remain pending."**
 
-This document establishes the verified, empirically tested baseline for the AeroTrust AI engineering demonstrator. Every claim, number, and status attribute in this report corresponds directly to executed code, reproducible scripts, or explicit architecture boundaries. 
+This document establishes the verified, empirically tested baseline for the CyaplaneX engineering demonstrator. Every claim, number, and status attribute in this report corresponds directly to executed code, reproducible scripts, or explicit architecture boundaries. 
 
 The demonstrator intentionally avoids unqualified claims such as "aircraft certified", "production ready", or "live AWS deployed".
 
@@ -277,7 +278,7 @@ DEMO COMPLETE — FULL CLOSED-LOOP CYCLE REPRODUCIBLY VERIFIED!
 
 ## 8. Final Audit Sign-Off
 
-This audit certifies that all statements and evidence in the AeroTrust AI project are technically defensible, backed by executed tests, and accurately represent the current engineering state of the repository.
+This audit certifies that all statements and evidence in the CyaplaneX project are technically defensible, backed by executed tests, and accurately represent the current engineering state of the repository.
 
 - **Application Architecture & Implementation Lead:** Kavindra E.M.
 - **Audit Conclusion:** Fully approved as a verified local software demonstrator.
