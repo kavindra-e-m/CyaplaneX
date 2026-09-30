@@ -1462,3 +1462,61 @@ It is **not**:
 - a claim of operational aircraft deployment.
 
 All aerospace claims must be supported by actual engineering evidence and presented within the scope of the prototype.
+
+---
+
+# 35. Factual Audit and Evidence Certification
+
+### Current Project Status
+> **Local end-to-end software demonstrator completed and verified; physical HIL, trained production model handoff and live AWS deployment remain pending.**
+
+### Separation of Subsystems
+- **COMPLETED:**
+  - Local edge pipeline orchestrator (`edge/orchestrator.py`, `edge/main.py`)
+  - Sensor trust engine (`edge/sensor_trust/`)
+  - Preprocessing pipeline (`edge/preprocessing/`)
+  - ML adapter boundary (`edge/ai/adapter.py`)
+  - Maintenance reasoning engine (`edge/maintenance/reasoning_engine.py`)
+  - Provenance generation (`edge/provenance/manifest.py`)
+  - **Device-local HMAC-SHA256 provenance signing for offline tamper-evidence demonstration**
+  - Offline store-and-forward queue (**Zero event loss verified during the simulated network-disconnect test**)
+  - Local cloud verification engine (`cloud/verification/`)
+  - WSGI REST API (`cloud/api/app.py`)
+  - Interactive MRO web dashboard (`dashboard/web/public/`)
+  - Closed-loop maintenance/re-test/closure lifecycle
+  - 47 automated tests in pytest
+
+- **PENDING:**
+  - Monhit trained ML artifact handoff
+  - Physical HIL hardware validation
+  - Live AWS deployment
+
+### Infrastructure & AWS Status
+- **IMPLEMENTED LOCALLY:** In-memory evidence store, local WSGI REST API server, cryptographic verifier, and offline synchronization coordinator.
+- **TARGET AWS ARCHITECTURE:** Greengrass edge deployment, AWS IoT Core MQTT broker, Amazon S3 evidence archive, Amazon Timestream metrics, and AWS KMS key governance.
+- **LIVE AWS DEPLOYMENT:** **PENDING / NOT DEPLOYED.** The local demonstrator does not require or communicate with live AWS cloud instances.
+
+### Cryptography & Offline Guarantees
+- **Cryptography Status:** Device-local HMAC-SHA256 provenance signing for offline tamper-evidence demonstration. It does not use asymmetric private/public key cryptography, HSM hardware security modules, or aircraft flight-certified key infrastructure.
+- **Offline Guarantee:** Zero event loss verified during the simulated network-disconnect test. It does not guarantee retention against unexpected system reboot, unhandled process crash, power loss, or underlying hardware disk failure.
+
+### Repair Effectiveness Audit
+- **Formula:** `improvement = max(0.0, min(1.0, (post - pre) / 100.0))` (`edge/maintenance/repair_effectiveness.py`)
+- **Pre-maintenance Health Score:** `6.2%` (Dynamically evaluated from 1.85g-1.95g dynamic vibration fault on bearing-thrust-01)
+- **Post-maintenance Health Score:** `100.0%` (Dynamically evaluated from 0.35g normal baseline after simulated replacement)
+- **Resulting Effectiveness:** `(100.0 - 6.2) / 100.0 = 0.938` &rarr; rounded to **`0.94`** (`REPAIR_VERIFIED`)
+- **Canonical Execution:** `python scripts/e2e_demo.py` / `pytest tests/e2e/test_closed_loop_lifecycle.py`
+- **Data Nature:** **Simulated sensor testbed input** (`ReplayVibrationSensor([1.85, 1.92, 1.88, 1.95])`).
+
+### Empirical Inference Latency Benchmark
+- Measured via `scripts/benchmark_inference.py` (100 warmup, 10,000 iterations, `time.perf_counter_ns`):
+  - Hardware: Intel x86_64, Windows 11 Build 26200
+  - Runtime: CPython 3.14.5
+  - Model: `BaselineDemonstratorModel` (`aerotrust-baseline-eval-v1`)
+  - Min: 53.1 µs (0.053 ms)
+  - Mean: 67.82 µs (0.068 ms)
+  - Median: 57.2 µs (0.057 ms)
+  - P95: 99.7 µs (0.100 ms)
+  - P99: 201.9 µs (0.202 ms)
+  - Max: 2.06 ms
+

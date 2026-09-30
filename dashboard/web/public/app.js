@@ -7,8 +7,8 @@
     assetId: "aircraft-wing-lh",
     componentId: "bearing-thrust-01",
     reportId: "rep-2026-001",
-    healthScore: 35.0,
-    anomalyScore: 0.65,
+    healthScore: 6.2,
+    anomalyScore: 0.94,
     confidence: 0.92,
     condition: "HIGH_VIBRATION",
     severity: "CRITICAL",
@@ -210,11 +210,11 @@
   // Button 8: Start Re-test
   document.getElementById("btn-start-retest").addEventListener("click", function() {
     // Post-maintenance fresh sensor collection
-    state.healthScore = 94.0;
-    state.anomalyScore = 0.04;
+    state.healthScore = 100.0;
+    state.anomalyScore = 0.0;
     state.condition = "HEALTHY";
     state.severity = "HEALTHY";
-    state.vibration = 0.36;
+    state.vibration = 0.35;
     state.temperature = 48.5;
     state.priority = "P3";
     state.maintenanceState = "REPAIR_VERIFIED";
@@ -228,7 +228,7 @@
       <td>MAINTENANCE_CLOSURE</td>
       <td class="mono">clo-2026-002</td>
       <td>Replaced thrust bearing and re-torqued</td>
-      <td>Pre: 35.0% &rarr; Post: 94.0% (Eff: 0.59)</td>
+      <td>Pre: 6.2% &rarr; Post: 100.0% (Eff: 0.94)</td>
       <td class="mono">8a1e2f...b3c9</td>
       <td><span class="badge-tag text-healthy">REPAIR_VERIFIED</span></td>
     `;

@@ -1,65 +1,104 @@
-# AeroTrust AI — Implementation Status & Verification Report
+# AeroTrust AI — Implementation Status & Verification Audit
 
 **Date:** 2026-09-30  
 **Lead Application Engineer / Architect:** Kavindra E.M.  
 **ML Lead (ML Artifact Boundary):** Monhit Raju  
-**Status:** Application Demonstrator Fully Implemented, Integrated, and Verified
+**Audit Classification:** Strict Factual Engineering Audit  
+**Project Status:** Local end-to-end software demonstrator completed and verified; physical HIL, trained production model handoff and live AWS deployment remain pending.
 
 ---
 
-## 1. Verified Architecture & Execution Summary
+## 1. Verified Implementation & Execution Baseline
 
-AeroTrust AI has completed the implementation of all application modules owned by **Kavindra E.M.** across the closed-loop lifecycle:
-**Sense &rarr; Validate Trust &rarr; Fuse & Preprocess &rarr; Infer Health &rarr; Reason Maintenance &rarr; Cryptographic Sign &rarr; Offline/Online Sync &rarr; Cloud Verification &rarr; MRO Action &rarr; Fresh Re-test &rarr; Repair Effectiveness &rarr; Digital Passport**.
+### Strict Separation of Subsystems
 
-### Test Suite Execution
-- **Automated Tests:** 47 passed (0 failures, 100% pass rate in 0.22s)
-  - `tests/e2e/test_closed_loop_lifecycle.py`: 1 passed (full closed-loop lifecycle)
-  - `tests/integration/test_api_endpoints.py`: 4 passed (health, maintenance workflow, replay rejection, tamper rejection)
-  - `tests/integration/test_api_smoke.py`: 1 passed (API service contract)
-  - `tests/security/test_provenance.py`: 2 passed (deterministic canonical hash, tamper detection)
-  - `tests/security/test_replay.py`: 2 passed (monotonic sequence rule, duplicate/older sequence rejection)
-  - `tests/unit/test_contracts.py`: 14 passed (Draft 2020-12 schema validation & lifecycle linkage)
-  - `tests/unit/test_health_result.py`: 1 passed (HealthResult serialization)
-  - `tests/unit/test_ml_and_preprocessing.py`: 4 passed (windowing, statistical feature extraction, baseline anomaly model)
-  - `tests/unit/test_provenance_and_connectivity.py`: 4 passed (manifest determinism, local signing, offline queue FIFO/capacity, sync coordinator)
-  - `tests/unit/test_sensor_acquisition.py`: 6 passed (simulated & replay sensors, monotonicity, schema validation)
-  - `tests/unit/test_sensor_checks.py`: 2 passed (range check, stuck check)
-  - `tests/unit/test_sensor_trust_engine.py`: 6 passed (range, freshness, stuck, drift, consensus, aggregation)
+#### COMPLETED (Locally Implemented & Executed)
+- **Local Edge Pipeline Orchestrator:** `edge/orchestrator.py`, `edge/main.py`
+- **Sensor Acquisition Boundary:** `edge/sensors/vibration.py`, `temperature.py`, `rpm.py`, `acquisition.py` (simulated & replay sources)
+- **Sensor Trust Engine:** `edge/sensor_trust/engine.py` (range, freshness, stuck, drift, consensus, multi-sensor aggregation)
+- **Preprocessing Pipeline:** `edge/preprocessing/pipeline.py`, `filtering.py`, `normalization.py` (statistical feature extraction & canonical window hash)
+- **ML Adapter Boundary:** `edge/ai/adapter.py`, `health_engine.py` (decoupled interface with baseline demonstrator model)
+- **Maintenance Reasoning Engine:** `edge/maintenance/reasoning_engine.py`, `reasoner.py`, `recommendation.py`, `priority.py`
+- **Cryptographic Provenance:** `edge/provenance/manifest.py`, `hashing.py`, `chain.py`
+- **Device-Local Signing:** `edge/provenance/signer.py` (Device-local HMAC-SHA256 provenance signing for offline tamper-evidence demonstration)
+- **Offline Store-and-Forward Queue:** `edge/connectivity/queue.py`, `sync.py`, `mqtt_client.py`
+- **Local Cloud Verification:** `cloud/verification/signature_verifier.py`, `replay_checker.py`, `cloud/ingestion/pipeline.py`
+- **Local Evidence Storage:** `cloud/storage/store.py` (`InMemoryEvidenceStore`)
+- **Verification & Maintenance REST API:** `cloud/api/app.py`, `health.py`, `verification.py`, `passport.py`, `maintenance.py`
+- **MRO Web Dashboard:** `dashboard/web/public/index.html`, `styles.css`, `app.js` (10 states, 8 interactive button workflows)
+- **Maintenance Closed Loop:** Diagnosis &rarr; Maintenance Started &rarr; Fresh Re-test &rarr; Repair Effectiveness &rarr; Signed ClosureRecord &rarr; Digital Passport
+- **Automated Test Suite:** 47 automated tests passing in 0.22s
 
-### Code Quality & Validation
-- **Python Linter:** `ruff check .` &rarr; **All checks passed!**
-- **Frontend Validation:** `node --check src/index.js` &rarr; **Passed!**
-- **Demonstration:** `python scripts/e2e_demo.py` &rarr; **20-step continuous InnoVent sequence passed!**
-
----
-
-## 2. Completed Subsystems Matrix
-
-| Subsystem | Implemented Components | Verification Evidence |
-|---|---|---|
-| **Shared Contracts** | `shared/contracts.py`, `shared/schemas/*.json` | Draft 2020-12 schema validation for all 5 lifecycle schemas. |
-| **Sensor Acquisition** | `edge/sensors/vibration.py`, `temperature.py`, `rpm.py`, `acquisition.py` | Simulated & replay sensor streams producing validated `SensorSample` records. |
-| **Sensor Trust Engine** | `edge/sensor_trust/range_check.py`, `freshness.py`, `stuck_check.py`, `drift_check.py`, `consensus.py`, `engine.py` | Multi-factor trust evaluation (`TRUSTED`, `DEGRADED`, `FAILED`) and composite aggregation. |
-| **Feature Preprocessing** | `edge/preprocessing/filtering.py`, `normalization.py`, `windowing.py`, `pipeline.py` | Statistical feature extraction (`vib_rms`, `vib_p2p`, `temp_mean`, `temp_max`, `rpm_mean`, `rpm_std`) and `sensor_window_hash`. |
-| **ML Inference Boundary** | `edge/ai/adapter.py`, `health_engine.py` | Stable `EdgeMLAdapter` decoupling application from ML notebooks, ready for Monhit's model handoff. |
-| **Maintenance Reasoning** | `edge/maintenance/reasoning_engine.py`, `reasoner.py`, `recommendation.py`, `priority.py`, `repair_effectiveness.py` | Context-aware reasoning, action recommendations, and priority assignment (`P1`, `P2`, `P3`). |
-| **Cryptographic Provenance** | `edge/provenance/manifest.py`, `hashing.py`, `chain.py`, `signer.py` | Deterministic canonical JSON, SHA-256 manifest hashing, and device-local HMAC-SHA256 signing. |
-| **Offline Queue & Sync** | `edge/connectivity/queue.py`, `mqtt_client.py`, `sync.py` | Bounded FIFO offline store-and-forward queue with automatic synchronization on reconnect. |
-| **Edge Orchestrator** | `edge/orchestrator.py`, `edge/main.py` | End-to-end edge pipeline controller runnable via `python -m edge.main`. |
-| **Cloud Ingestion & Storage** | `cloud/ingestion/pipeline.py`, `cloud/storage/store.py` | Ingestion pipeline with schema validation, replay sequence checking, and thread-safe evidence persistence. |
-| **Verification & REST API** | `cloud/api/app.py`, `health.py`, `verification.py`, `passport.py`, `maintenance.py` | Framework-neutral WSGI service exposing `/health`, `/verification/*`, `/maintenance/*`, `/passport/*`. |
-| **MRO Web Dashboard** | `dashboard/web/public/index.html`, `styles.css`, `app.js` | Interactive dark-mode dashboard with all 10 states and operator prompt workflows. |
+#### PENDING (Engineering Boundaries & External Dependencies)
+- **Monhit Raju ML Artifact:** Production trained model weights, evaluation reports, and runtime export (`ml/models/`) remain pending Monhit's delivery under Section 20 handoff rules.
+- **Physical Hardware-in-the-Loop (HIL):** ESP32 microcontroller acquisition, physical accelerometer, thermocouple, and rotating shaft test bench remain pending physical wiring and laboratory setup.
+- **Live AWS Cloud Deployment:** AWS IoT Greengrass, S3, Timestream, DynamoDB, and KMS remain target architecture definitions only. No live AWS resources are currently deployed.
 
 ---
 
-## 3. Team Ownership Boundary
+## 2. Factual Evidence Table
 
-- **Kavindra E.M.** — Completed application, edge runtime, sensor trust, provenance, local signing, offline queue, verification API, storage, tests, and MRO dashboard.
-- **Monhit Raju** — ML only (`ml/**`). When Monhit's artifact is delivered according to Section 20 of `AeroTrust_AI_Implementation_README.md`, it can be plugged directly into `EdgeMLAdapter` without touching application orchestration.
+| Feature | Implementation Status | Evidence File / Test | Measured Result | Environment | Limitation |
+|---|---|---|---|---|---|
+| **JSON Schemas** | IMPLEMENTED | `tests/unit/test_contracts.py` | 14/14 tests passed | Python 3.14.5 / uv | Validated against Draft 2020-12; schemas are static specifications. |
+| **Sensor Acquisition** | IMPLEMENTED LOCALLY | `tests/unit/test_sensor_acquisition.py` | 6/6 tests passed | Local CPython | Uses simulated/replay generators; physical ESP32 acquisition pending. |
+| **Sensor Trust** | IMPLEMENTED LOCALLY | `tests/unit/test_sensor_trust_engine.py` | 6/6 tests passed; flags `TRUSTED`, `DEGRADED`, `FAILED` | Local CPython | Heuristic limits configured for demonstrator; domain calibration pending. |
+| **Feature Extraction** | IMPLEMENTED LOCALLY | `tests/unit/test_ml_and_preprocessing.py` | 6 statistical features extracted + SHA-256 window hash | Local CPython | Baseline time-domain features; FFT spectral features pending Monhit specification. |
+| **Inference Latency** | BENCHMARKED LOCALLY | `scripts/benchmark_inference.py` | Mean: 64.84 µs (0.065 ms), Median: 57.3 µs, P95: 95.9 µs, Max: 1.41 ms (10,000 cycles) | Windows 11 x86_64, CPython 3.14.5 | Measured on baseline demonstrator model; not physical edge MCU. |
+| **Maintenance Reasoning**| IMPLEMENTED LOCALLY | `tests/unit/test_ml_and_preprocessing.py`, `tests/e2e/test_closed_loop_lifecycle.py` | Generates reason, action, priority (`P1`, `P2`, `P3`) | Local CPython | Prototype engineering rules; not certified aviation maintenance manual data. |
+| **Provenance Signing** | IMPLEMENTED LOCALLY | `tests/unit/test_provenance_and_connectivity.py` | Device-local HMAC-SHA256 signature generated | Local CPython | Device-local HMAC-SHA256; not asymmetric hardware HSM/TPM. |
+| **Tamper Detection** | IMPLEMENTED LOCALLY | `tests/security/test_provenance.py`, `scripts/tamper_test.py`, `scripts/e2e_demo.py` | 100% rejection (`PROVENANCE_VIOLATION`) upon field alteration | Local CPython | Tested on canonical payload fields; key custody is local. |
+| **Replay Protection** | IMPLEMENTED LOCALLY | `tests/security/test_replay.py`, `scripts/replay_test.py` | Duplicate & older sequences rejected (`REPLAY_REJECTED`) | Local CPython | Sequence-based monotonically increasing rule per device ID. |
+| **Offline Buffering** | IMPLEMENTED LOCALLY | `tests/unit/test_provenance_and_connectivity.py`, `scripts/e2e_demo.py` | Zero event loss verified during simulated network-disconnect test | Local CPython | In-memory FIFO queue; does not protect against sudden power loss or process crash. |
+| **Repair Effectiveness**| IMPLEMENTED LOCALLY | `scripts/e2e_demo.py`, `tests/e2e/test_closed_loop_lifecycle.py` | Pre: 6.2%, Post: 100.0%, Effectiveness: 0.94 (`REPAIR_VERIFIED`) | Local CPython | Computed using simulated fault/healthy windows; not physical aircraft repair. |
+| **Digital Passport** | IMPLEMENTED LOCALLY | `tests/e2e/test_closed_loop_lifecycle.py`, `cloud/api/passport.py` | Chronological append-only record of diagnostic event & closure | Local CPython | In-memory store; persistent DynamoDB/Timestream integration pending. |
+| **MRO Web Dashboard** | IMPLEMENTED LOCALLY | `dashboard/web/public/index.html`, `app.js`, `styles.css` | Interactive view with all 10 states and 8 action buttons | Modern Web Browser | Client-side controller with mock/API hooks; production authentication pending. |
+| **AWS Cloud Services** | TARGET ARCHITECTURE | `docs/HLD.md`, `docs/LLD.md` | Cloud architecture documented; local in-memory fallback active | Target Design | **NOT DEPLOYED**. Live AWS deployment pending account credentials. |
 
 ---
 
-## 4. Engineering Disclaimer
+## 3. Detailed Audit Findings
 
-AeroTrust AI is an engineering demonstrator developed for Tata Technologies InnoVent 2026. All results documented are based on actual executed tests and prototype testbed measurements. It does not constitute aircraft operational certification.
+### 3.1 Repair Effectiveness Formula & Data Audit
+- **Formula:**
+  $$\text{improvement} = \max\left(0.0, \min\left(1.0, \frac{\text{post\_health\_score} - \text{pre\_health\_score}}{100.0}\right)\right)$$
+  *(Defined in `edge/maintenance/repair_effectiveness.py:8`)*
+- **Canonical E2E Demonstration Run:**
+  - **Pre-maintenance Health Score:** `6.2%` (Evaluated dynamically from 1.85g-1.95g dynamic vibration fault on bearing-thrust-01)
+  - **Post-maintenance Health Score:** `100.0%` (Evaluated dynamically from 0.35g normal vibration baseline after simulated bearing replacement)
+  - **Resulting Effectiveness:** `(100.0 - 6.2) / 100.0 = 0.938` &rarr; rounded to **`0.94`** (`REPAIR_VERIFIED`)
+  - **Execution Command:** `python scripts/e2e_demo.py`
+  - **Data Nature:** **Simulated sensor testbed input** via `ReplayVibrationSensor([1.85, 1.92, 1.88, 1.95])`.
+- **Unit/Integration Test Variation:**
+  - In `tests/integration/test_api_endpoints.py`, an arbitrary synthetic test fixture (`pre: 35.0%`, `post: 100.0%`) was used to assert route plumbing (`effectiveness: 0.65`). The canonical demonstration value for all presentations is **0.94** (`6.2% &rarr; 100.0%`).
+
+### 3.2 Cryptographic Signing Statement
+- The edge signing boundary uses:
+  > **Device-local HMAC-SHA256 provenance signing for offline tamper-evidence demonstration.**
+- It does not use asymmetric private/public key cryptography, HSM hardware security modules, or aircraft flight-certified key infrastructure.
+
+### 3.3 Offline Buffering Statement
+- The offline data retention guarantee is strictly:
+  > **Zero event loss verified during the simulated network-disconnect test.**
+- It does not guarantee retention against unexpected system reboot, unhandled process crash, power loss, or underlying hardware disk failure.
+
+### 3.4 Inference Latency Benchmark Audit
+- Measured via `scripts/benchmark_inference.py`:
+  - **Hardware:** Intel x86_64, Windows 11 Build 26200
+  - **Runtime:** CPython 3.14.5
+  - **Model:** `BaselineDemonstratorModel` (`aerotrust-baseline-eval-v1`)
+  - **Iterations:** 100 warm-up cycles, 10,000 timed iterations
+  - **Clock:** `time.perf_counter_ns`
+  - **Results:**
+    - Min: 53.6 µs (0.054 ms)
+    - Mean: 64.84 µs (0.065 ms)
+    - Median: 57.3 µs (0.057 ms)
+    - P95: 95.9 µs (0.096 ms)
+    - P99: 196.5 µs (0.197 ms)
+    - Max: 1,410.5 µs (1.41 ms)
+
+---
+
+## 4. Final Project Status
+
+> **Local end-to-end software demonstrator completed and verified; physical HIL, trained production model handoff and live AWS deployment remain pending.**
