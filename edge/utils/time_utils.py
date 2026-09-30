@@ -1,7 +1,7 @@
 """Time utilities boundary."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def utc_now() -> datetime:
     """Return an aware UTC timestamp."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)

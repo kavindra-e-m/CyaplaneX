@@ -6,7 +6,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cloud.verification.replay_checker import accepts_sequence
 
-
 if __name__ == "__main__":
     last_sequence = 7
     print(f"new sequence accepted: {accepts_sequence(8, last_sequence)}")

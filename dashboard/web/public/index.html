@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AeroTrust AI - Trusted Closed-Loop Edge AI Predictive Maintenance & Aircraft Health Monitoring">
+  <title>AeroTrust AI — MRO Predictive Maintenance & Provenance Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <h1>AeroTrust AI <span class="badge-tag">Tata InnoVent 2026</span></h1>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
+          Trusted Closed-Loop Edge AI Predictive Maintenance & Aircraft Health Monitoring
+        </p>
+      </div>
+      <div class="system-status-pills">
+        <div class="status-pill" id="pill-system-state">
+          <span class="status-indicator status-online" id="ind-system-state"></span>
+          <span id="txt-system-state">HEALTHY</span>
+        </div>
+        <div class="status-pill" id="pill-connectivity">
+          <span class="status-indicator status-online" id="ind-connectivity"></span>
+          <span id="txt-connectivity">ONLINE</span>
+        </div>
+        <div class="status-pill" id="pill-provenance">
+          <span class="status-indicator status-online" id="ind-provenance"></span>
+          <span id="txt-provenance">PROVENANCE VERIFIED</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Master Action Toolbar -->
+    <section class="toolbar-card">
+      <h3>Interactive Engineering Actions</h3>
+      <div class="toolbar-buttons">
+        <button class="btn btn-primary" id="btn-open-asset">Open Asset</button>
+        <button class="btn btn-secondary" id="btn-view-diagnostic">View Diagnostic</button>
+        <button class="btn btn-secondary" id="btn-verify-provenance">Verify Provenance</button>
+        <button class="btn btn-danger" id="btn-tamper-test">Run Tamper Test</button>
+        <button class="btn btn-warning" id="btn-simulate-offline">Simulate Offline</button>
+        <button class="btn btn-success" id="btn-restore-connectivity">Restore Connectivity</button>
+        <button class="btn btn-warning" id="btn-mark-maintenance">Mark Maintenance Started</button>
+        <button class="btn btn-primary" id="btn-start-retest">Start Re-test</button>
+      </div>
+    </section>
+
+    <!-- Workflow Guidance Console -->
+    <section class="card col-12" style="padding: 16px 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">
+          Operator Guidance & Execution Prompt
+        </span>
+        <span id="lbl-step-state" class="badge-tag">STEP READY</span>
+      </div>
+      <div class="console-box" id="console-output">
+        System initialized. Select "Open Asset" or "View Diagnostic" to review latest telemetry and health evidence.
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+      <!-- Left Column: Asset & Health -->
+      <div class="card col-6">
+        <div class="card-header">
+          <h2 class="card-title">Asset & AI Diagnostic Overview</h2>
+          <span class="badge-tag" id="lbl-component">bearing-thrust-01</span>
+        </div>
+        <div class="metric-row">
+          <div class="metric-box">
+            <div class="metric-label">Health Score</div>
+            <div class="metric-val text-healthy" id="val-health-score">95.0%</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Anomaly Score</div>
+            <div class="metric-val" id="val-anomaly-score">0.05</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Confidence</div>
+            <div class="metric-val" id="val-confidence">94%</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+          <div><strong style="color: var(--text-secondary);">Asset Target:</strong> <span id="val-asset-id">aircraft-wing-lh</span></div>
+          <div><strong style="color: var(--text-secondary);">Condition Flag:</strong> <span id="val-condition" style="font-weight: 600;">HEALTHY</span></div>
+          <div><strong style="color: var(--text-secondary);">Report Reference:</strong> <span class="mono" id="val-report-id">rep-2026-init</span></div>
+          <div><strong style="color: var(--text-secondary);">Active Model:</strong> <span class="mono" id="val-model-meta">aerotrust-baseline-eval-v1 (v1.0.0)</span></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Sensor Trust -->
+      <div class="card col-6">
+        <div class="card-header">
+          <h2 class="card-title">Sensor Trust Engine (Gate B)</h2>
+          <span class="badge-tag text-healthy" id="lbl-trust-status">TRUSTED</span>
+        </div>
+        <div class="metric-row">
+          <div class="metric-box">
+            <div class="metric-label">Vibration (RMS)</div>
+            <div class="metric-val" id="val-vibration">0.35 g</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Temperature</div>
+            <div class="metric-val" id="val-temperature">52.4 °C</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Shaft RPM</div>
+            <div class="metric-val" id="val-rpm">3605 rpm</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.85rem;">
+          <div><strong style="color: var(--text-secondary);">Range Check:</strong> <span id="chk-range" style="color: var(--accent-emerald);">PASSED</span></div>
+          <div><strong style="color: var(--text-secondary);">Data Freshness:</strong> <span id="chk-fresh" style="color: var(--accent-emerald);">PASSED</span></div>
+          <div><strong style="color: var(--text-secondary);">Stuck Detector:</strong> <span id="chk-stuck" style="color: var(--accent-emerald);">NO STUCK VALS</span></div>
+          <div><strong style="color: var(--text-secondary);">Consensus Score:</strong> <span id="chk-consensus" class="mono">1.00</span></div>
+        </div>
+      </div>
+
+      <!-- Maintenance Reasoning Panel -->
+      <div class="card col-6">
+        <div class="card-header">
+          <h2 class="card-title">Maintenance Reasoning & Decision (Gate F/G)</h2>
+          <span class="badge-tag" id="lbl-priority">PRIORITY: P3</span>
+        </div>
+        <div style="font-size: 0.9rem; line-height: 1.6;">
+          <div style="margin-bottom: 8px;">
+            <strong style="color: var(--text-secondary); display: block;">Maintenance Reason:</strong>
+            <span id="txt-reason">Component bearing-thrust-01 operates within expected parameters with TRUSTED sensor evidence.</span>
+          </div>
+          <div>
+            <strong style="color: var(--text-secondary); display: block;">Recommended Action:</strong>
+            <span id="txt-recommendation">Continue scheduled monitoring for bearing-thrust-01.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Provenance & Offline Buffering Panel -->
+      <div class="card col-6">
+        <div class="card-header">
+          <h2 class="card-title">Cryptographic Provenance & Offline Queue</h2>
+          <span class="badge-tag" id="lbl-queue-depth">QUEUE: 0 BUFFERED</span>
+        </div>
+        <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
+          <div><strong style="color: var(--text-secondary);">Sensor Window Hash:</strong> <span class="mono" id="txt-window-hash" style="word-break: break-all;">9f83c6...79ac4f</span></div>
+          <div><strong style="color: var(--text-secondary);">Manifest Hash:</strong> <span class="mono" id="txt-manifest-hash" style="word-break: break-all;">6b86b2...75b4b</span></div>
+          <div><strong style="color: var(--text-secondary);">Digital Signature:</strong> <span class="mono" id="txt-signature" style="word-break: break-all;">hmac-sha256:d8a1...</span></div>
+          <div><strong style="color: var(--text-secondary);">Sequence No / Nonce:</strong> <span class="mono" id="txt-seq-nonce">Seq: 1 | Nonce: n-550e84</span></div>
+        </div>
+      </div>
+
+      <!-- Component Digital Passport Table -->
+      <div class="card col-12">
+        <div class="card-header">
+          <h2 class="card-title">Component Digital Passport & Lifecycle Records</h2>
+          <span class="badge-tag" id="lbl-passport-count">2 Records Recorded</span>
+        </div>
+        <table class="passport-table">
+          <thead>
+            <tr>
+              <th>Timestamp (UTC)</th>
+              <th>Record Type</th>
+              <th>Reference ID</th>
+              <th>Condition / Action</th>
+              <th>Health Evidence</th>
+              <th>Provenance Hash</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="passport-tbody">
+            <tr>
+              <td class="mono">2026-09-30 09:15:00</td>
+              <td>DIAGNOSTIC_EVENT</td>
+              <td class="mono">rep-2026-001</td>
+              <td>HIGH_VIBRATION</td>
+              <td>Health: 35.0% | Anomaly: 0.65</td>
+              <td class="mono">9f83c6...ac4f</td>
+              <td><span class="badge-tag text-healthy">VERIFIED</span></td>
+            </tr>
+            <tr>
+              <td class="mono">2026-09-30 10:20:00</td>
+              <td>MAINTENANCE_CLOSURE</td>
+              <td class="mono">clo-2026-001</td>
+              <td>Replaced thrust bearing and re-torqued</td>
+              <td>Pre: 35.0% &rarr; Post: 92.0% (Eff: 0.57)</td>
+              <td class="mono">6b86b2...b4b</td>
+              <td><span class="badge-tag text-healthy">REPAIR_VERIFIED</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
