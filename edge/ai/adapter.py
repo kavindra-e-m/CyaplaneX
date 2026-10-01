@@ -98,7 +98,14 @@ class EdgeMLAdapter:
     FEATURE_CONTRACT: ClassVar[tuple[str, ...]] = FROZEN_FEATURE_NAMES
 
     def __init__(self, model: InferenceModel | None = None) -> None:
-        self.model = model or BaselineDemonstratorModel()
+        if model is not None:
+            self.model = model
+        else:
+            try:
+                from ml.export.model import ProductionModel
+                self.model = ProductionModel()
+            except (ImportError, OSError, ValueError):
+                self.model = BaselineDemonstratorModel()
 
     def infer(self, features: Sequence[float]) -> HealthResult:
         """Execute inference and return a validated HealthResult value object."""

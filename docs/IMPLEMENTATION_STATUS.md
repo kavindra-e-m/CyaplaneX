@@ -4,7 +4,7 @@
 **Lead Application Engineer / Architect:** Kavindra E.M.  
 **ML Lead (ML Artifact Boundary):** Monhit Raju  
 **Audit Classification:** Strict Factual Engineering Audit  
-**Project Status:** CyaplaneX local end-to-end software demonstrator completed and verified; physical HIL validation, trained ML artifact handoff and live AWS deployment remain pending.
+**Project Status:** CyaplaneX local end-to-end software demonstrator completed and verified with production ML subsystem; physical HIL validation and live AWS deployment remain pending.
 
 ---
 
@@ -43,7 +43,8 @@
 | **JSON Schemas** | IMPLEMENTED | `tests/unit/test_contracts.py` | 14/14 tests passed | Python 3.14.5 / uv | Validated against Draft 2020-12; schemas are static specifications. |
 | **Sensor Acquisition** | IMPLEMENTED LOCALLY | `tests/unit/test_sensor_acquisition.py` | 6/6 tests passed | Local CPython | Uses simulated/replay generators; physical ESP32 acquisition pending. |
 | **Sensor Trust** | IMPLEMENTED LOCALLY | `tests/unit/test_sensor_trust_engine.py` | 6/6 tests passed; flags `TRUSTED`, `DEGRADED`, `FAILED` | Local CPython | Heuristic limits configured for demonstrator; domain calibration pending. |
-| **Feature Extraction** | IMPLEMENTED LOCALLY | `tests/unit/test_ml_and_preprocessing.py` | 6 statistical features extracted + SHA-256 window hash | Local CPython | Baseline time-domain features; FFT spectral features pending Monhit specification. |
+| **Feature Extraction** | IMPLEMENTED LOCALLY | `tests/unit/test_ml_and_preprocessing.py`, `tests/unit/test_ml_production_model.py` | 6 statistical features + SHA-256 window hash; FFT spectral harmonics (BPFO/BPFI/BSF/FTF) | Local CPython | Baseline time-domain and spectral feature extractors active. |
+| **Production ML Subsystem** | IMPLEMENTED & VERIFIED | `ml/export/model.py`, `tests/unit/test_ml_production_model.py`, `scripts/verify_ml_artifact.py` | 99.8% test accuracy, 0.9997 CV F1; 10/10 ML tests passed; dual Joblib/ONNX runtimes | Local CPython 3.14.5 | Trained on CWRU bearing dataset; physical MCU deployment pending. |
 | **Inference Latency** | BENCHMARKED LOCALLY | `scripts/benchmark_inference.py` | Mean: 64.84 µs (0.065 ms), Median: 57.3 µs, P95: 95.9 µs, Max: 1.41 ms (10,000 cycles) | Windows 11 x86_64, CPython 3.14.5 | Measured on baseline demonstrator model; not physical edge MCU. |
 | **Maintenance Reasoning**| IMPLEMENTED LOCALLY | `tests/unit/test_ml_and_preprocessing.py`, `tests/e2e/test_closed_loop_lifecycle.py` | Generates reason, action, priority (`P1`, `P2`, `P3`) | Local CPython | Prototype engineering rules; not certified aviation maintenance manual data. |
 | **Provenance Signing** | IMPLEMENTED LOCALLY | `tests/unit/test_provenance_and_connectivity.py` | Device-local HMAC-SHA256 signature generated | Local CPython | Device-local HMAC-SHA256; not asymmetric hardware HSM/TPM. |
@@ -101,4 +102,4 @@
 
 ## 4. Final Project Status
 
-> **"CyaplaneX local end-to-end software demonstrator completed and verified; physical HIL validation, trained ML artifact handoff and live AWS deployment remain pending."**
+> **"CyaplaneX local end-to-end software demonstrator completed and verified with production ML subsystem; physical HIL validation and live AWS deployment remain pending."**

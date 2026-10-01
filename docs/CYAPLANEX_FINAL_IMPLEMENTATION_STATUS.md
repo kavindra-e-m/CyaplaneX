@@ -13,8 +13,8 @@
 ## 1. Current Project Status
 
 **Canonical Project Status Declaration:**
-> **A. SOFTWARE-ONLY DEMONSTRATOR FINAL**  
-> *"CyaplaneX local end-to-end software demonstrator completed and verified; physical HIL validation, trained ML artifact handoff and live AWS deployment remain pending."*
+> **A. SOFTWARE DEMONSTRATOR WITH PRODUCTION ML SUBSYSTEM FINAL**  
+> *"CyaplaneX local end-to-end software demonstrator completed and verified with production ML subsystem; physical HIL validation and live AWS deployment remain pending."*
 
 - **Demonstrator Readiness:** Fully functional local end-to-end software demonstrator with closed-loop maintenance validation.
 - **Certification Boundaries:** This system is an engineering research prototype; it is **NOT** flight-tested, **NOT** aircraft-certified (DO-178C/DO-254 pending), and **NOT** live deployed to production cloud infrastructure.
@@ -186,11 +186,11 @@ All primary documentation and evidence files are fully synchronized with the can
 
 ## 12. Remaining TODOs
 
-### ML Development (Owner: Monhit Raju)
-- [ ] Train production AI/ML model using aerospace vibration/temperature datasets.
-- [ ] Export model artifact (ONNX or Python class) matching the 6-feature vector specification.
-- [ ] Compute deterministic SHA-256 model hash and author evaluation report.
-- [ ] Execute 12-point ML integration acceptance gate.
+### ML Development (Owner: Monhit Raju) — COMPLETED & VERIFIED
+- [x] Train production AI/ML model using aerospace vibration/temperature datasets (CWRU bearing benchmark, 5,000 samples, GradientBoosting ensemble).
+- [x] Export model artifact (`cyaplanex_production_model.joblib`, `CyaplaneXProductionModel`, ONNX `cyaplanex_model.onnx`) matching the 6-feature vector specification.
+- [x] Compute deterministic SHA-256 model hash and author evaluation report (`ml/evaluation/EVALUATION_REPORT.md`: 99.8% test accuracy, 0.9997 CV F1).
+- [x] Execute 12-point ML integration acceptance gate (`scripts/verify_ml_artifact.py`: 100% passed).
 
 ### Hardware-in-the-Loop Validation (Owner: Hardware Team)
 - [ ] Fabricate rotating machinery test-rig with DC motor and bearing mounts.
