@@ -1,247 +1,720 @@
-// CyaplaneX - MRO Dashboard Interactive Controller
+// CyaplaneX Enterprise Aerospace MRO Platform — Client Controller
+// Reference-Driven Design System Implementation
+
 (function() {
   "use strict";
 
-  // System State Model
+  // =========================================================================
+  // State Model
+  // =========================================================================
   const state = {
+    // Current Active Navigation View
+    currentView: "view-overview",
+
+    // Engine & Asset Identity
     assetId: "aircraft-wing-lh",
     componentId: "bearing-thrust-01",
-    reportId: "rep-2026-001",
-    healthScore: 6.2,
-    anomalyScore: 0.94,
-    confidence: 0.92,
-    condition: "HIGH_VIBRATION",
-    severity: "CRITICAL",
-    priority: "P1",
-    trustStatus: "TRUSTED",
-    vibration: 1.85,
-    temperature: 54.2,
-    rpm: 3600,
-    connectivity: "ONLINE",
+    engineSerial: "AIRC-CF34-01",
+    engineModel: "CF34-8E Turbofan",
+
+    // Model Provenance Metadata
+    modelId: "cyaplanex-gb-aeromodel-v1",
+    modelVersion: "1.0.0",
+    modelHash: "95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b",
+    modelStatus: "OPTIMAL",
+
+    // System Telemetry & Diagnostic Health
+    systemStatus: "HEALTHY", // "HEALTHY" | "CRITICAL FAULT"
+    healthScore: 100.0,
+    failureRisk: 2.4,
+    anomalyScore: 0.06,
+    confidence: 0.94,
+    condition: "HEALTHY",
+    severity: "LOW", // "LOW" | "CRITICAL"
+    priority: "P3 - NORMAL", // "P3 - NORMAL" | "P1 - CRITICAL"
+
+    // Sensor Readings (6-Feature Tuple Contract)
+    vibrationRms: 0.35,
+    vibrationP2p: 0.82,
+    temperatureMean: 48.5,
+    temperatureMax: 51.0,
+    rpmMean: 1750,
+    rpmStd: 4.8,
+    scavengePressure: 72.4,
+
+    // Sensor Trust Gating (Gate B)
+    trustStatus: "TRUSTED", // "TRUSTED" | "DEGRADED"
+
+    // Connectivity & Store-and-Forward Sync
+    connectivity: "ONLINE", // "ONLINE" | "OFFLINE"
     queueDepth: 0,
-    provenanceStatus: "PROVENANCE_VERIFIED",
-    windowHash: "9f83c60517b4a02aca02648667232e7568b5e618e6d5da50e02fb8f54279ac4f",
-    manifestHash: "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
-    signature: "hmac-sha256:d8a1c028be4910cf1c94d039f60ad0cfa82672bf6c6a85f2b2c9a9d701e4a11f",
+
+    // Cryptographic Provenance
+    provenanceStatus: "PROVENANCE_VERIFIED", // "PROVENANCE_VERIFIED" | "PROVENANCE_VIOLATION"
+    windowHash: "73d4f37a6d157fe05e9ba5642fcf5dca658920192e44810938bb0912fa8901b2",
+    manifestHash: "32e201316aaf821391f93ecd9b9452cb90145892019485bb0941829384756281",
+    signature: "hmac-sha256:65332fe2cbde4f69093d30928475930294857201948572019485720194857201",
     sequence: 1,
     nonce: "n-550e8400-e29b-41d4-a716-446655440000",
-    maintenanceState: "MAINTENANCE_REQUIRED",
-    reason: "Elevated dynamic vibration (RMS 1.85g) detected on bearing-thrust-01 with TRUSTED sensor evidence.",
-    action: "Halt test-rig rotation; inspect bearing-thrust-01 mountings, shaft alignment, and bearing race for spalling."
+
+    // MRO Maintenance Lifecycle State
+    maintenanceState: "NOMINAL", // "NOMINAL" | "MAINTENANCE_REQUIRED" | "MAINTENANCE_IN_PROGRESS" | "REPAIR_VERIFIED" | "CLOSED"
+    repairEffectiveness: 0.92,
+    currentReportId: "rep-demo-002",
+    closureId: "clo-1fc447c2"
   };
 
+  // =========================================================================
   // DOM Elements
+  // =========================================================================
   const el = {
-    txtSystemState: document.getElementById("txt-system-state"),
-    indSystemState: document.getElementById("ind-system-state"),
+    // Header & Badges
+    pageHeading: document.getElementById("page-heading"),
+    badgeAiModel: document.getElementById("badge-ai-model"),
+    txtAiModel: document.getElementById("txt-ai-model"),
+    dotAiModel: document.getElementById("dot-ai-model"),
+    badgeConnectivity: document.getElementById("badge-connectivity"),
     txtConnectivity: document.getElementById("txt-connectivity"),
-    indConnectivity: document.getElementById("ind-connectivity"),
+    dotConnectivity: document.getElementById("dot-connectivity"),
+    badgeProvenance: document.getElementById("badge-provenance"),
     txtProvenance: document.getElementById("txt-provenance"),
-    indProvenance: document.getElementById("ind-provenance"),
-    consoleOutput: document.getElementById("console-output"),
-    lblStepState: document.getElementById("lbl-step-state"),
-    valHealthScore: document.getElementById("val-health-score"),
-    valAnomalyScore: document.getElementById("val-anomaly-score"),
-    valConfidence: document.getElementById("val-confidence"),
-    valCondition: document.getElementById("val-condition"),
-    valReportId: document.getElementById("val-report-id"),
-    lblTrustStatus: document.getElementById("lbl-trust-status"),
+    dotProvenance: document.getElementById("dot-provenance"),
+    lblDemoStatus: document.getElementById("lbl-demo-status"),
+
+    // KPI Cards
+    kpiSysStatus: document.getElementById("kpi-sys-status"),
+    kpiSysSub: document.getElementById("kpi-sys-sub"),
+    kpiHealthScore: document.getElementById("kpi-health-score"),
+    kpiFailureRisk: document.getElementById("kpi-failure-risk"),
+    kpiPriority: document.getElementById("kpi-priority"),
+    kpiPrioritySub: document.getElementById("kpi-priority-sub"),
+    kpiAlerts: document.getElementById("kpi-alerts"),
+    kpiAlertsSub: document.getElementById("kpi-alerts-sub"),
+
+    // Sensor Overview
     valVibration: document.getElementById("val-vibration"),
     valTemperature: document.getElementById("val-temperature"),
     valRpm: document.getElementById("val-rpm"),
-    lblPriority: document.getElementById("lbl-priority"),
-    txtReason: document.getElementById("txt-reason"),
-    txtRecommendation: document.getElementById("txt-recommendation"),
-    lblQueueDepth: document.getElementById("lbl-queue-depth"),
-    txtWindowHash: document.getElementById("txt-window-hash"),
-    txtManifestHash: document.getElementById("txt-manifest-hash"),
-    txtSignature: document.getElementById("txt-signature"),
-    txtSeqNonce: document.getElementById("txt-seq-nonce"),
-    passportTbody: document.getElementById("passport-tbody"),
-    lblPassportCount: document.getElementById("lbl-passport-count")
+    trustVibration: document.getElementById("trust-vibration"),
+    trustTemperature: document.getElementById("trust-temperature"),
+    trustRpm: document.getElementById("trust-rpm"),
+    badgeAggregateTrust: document.getElementById("badge-aggregate-trust"),
+
+    // Callout Overlays on Engine Visual
+    coutVibration: document.getElementById("cout-vibration"),
+    coutStatusVib: document.getElementById("cout-status-vib"),
+    coutTemp: document.getElementById("cout-temp"),
+    coutStatusTemp: document.getElementById("cout-status-temp"),
+    coutRpm: document.getElementById("cout-rpm"),
+    coutStatusRpm: document.getElementById("cout-status-rpm"),
+
+    // Predictive Insights
+    insConditionText: document.getElementById("ins-condition-text"),
+    insModelHash: document.getElementById("ins-model-hash"),
+    insConfidence: document.getElementById("ins-confidence"),
+    insSeverity: document.getElementById("ins-severity"),
+    insAction: document.getElementById("ins-action"),
+
+    // Evidence Drawer
+    drawer: document.getElementById("evidence-drawer"),
+    drawerBackdrop: document.getElementById("drawer-backdrop"),
+    drwBadgeProv: document.getElementById("drw-badge-prov"),
+    drwEventId: document.getElementById("drw-event-id"),
+    drwVibRms: document.getElementById("drw-vib-rms"),
+    drwVibP2p: document.getElementById("drw-vib-p2p"),
+    drwTempMean: document.getElementById("drw-temp-mean"),
+    drwTempMax: document.getElementById("drw-temp-max"),
+    drwRpmMean: document.getElementById("drw-rpm-mean"),
+    drwRpmStd: document.getElementById("drw-rpm-std"),
+    drwCond: document.getElementById("drw-cond"),
+    drwHealth: document.getElementById("drw-health"),
+    drwSev: document.getElementById("drw-sev"),
+    drwAnomaly: document.getElementById("drw-anomaly"),
+    drwModhash: document.getElementById("drw-modhash"),
+    drwWinhash: document.getElementById("drw-winhash"),
+    drwSig: document.getElementById("drw-sig"),
+
+    // Provenance Tab Elements
+    txtProvWinhash: document.getElementById("txt-prov-winhash"),
+    txtProvManhash: document.getElementById("txt-prov-manhash"),
+    txtProvModhash: document.getElementById("txt-prov-modhash"),
+    txtProvSignature: document.getElementById("txt-prov-signature"),
+    txtTamperResult: document.getElementById("txt-tamper-result"),
+    provStatusTag: document.getElementById("prov-status-tag"),
+
+    // Sensors Tab
+    stVibVal: document.getElementById("st-vib-val"),
+    stTempVal: document.getElementById("st-temp-val"),
+    stRpmVal: document.getElementById("st-rpm-val"),
+    stVibTrust: document.getElementById("st-vib-trust"),
+
+    // Table elements
+    tblAlertCond: document.getElementById("tbl-alert-cond"),
+    tblAlertScore: document.getElementById("tbl-alert-score"),
+    tblAlertProv: document.getElementById("tbl-alert-prov"),
+    tblTaskPrio: document.getElementById("tbl-task-prio"),
+    tblTaskStatus: document.getElementById("tbl-task-status"),
+
+    // Toast Container
+    toastContainer: document.getElementById("toast-container")
   };
 
-  function updateView() {
-    el.valHealthScore.textContent = `${state.healthScore.toFixed(1)}%`;
-    if (state.healthScore >= 75) {
-      el.valHealthScore.className = "metric-val text-healthy";
-    } else if (state.healthScore >= 40) {
-      el.valHealthScore.className = "metric-val text-warning";
+  // =========================================================================
+  // Toast Notification Generator
+  // =========================================================================
+  function showToast(message, isError) {
+    if (!el.toastContainer) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    if (isError) {
+      toast.style.borderLeft = "4px solid var(--status-critical)";
     } else {
-      el.valHealthScore.className = "metric-val text-critical";
+      toast.style.borderLeft = "4px solid var(--accent-orange)";
+    }
+    toast.innerHTML = `<span>${message}</span>`;
+    el.toastContainer.appendChild(toast);
+
+    // Animate in
+    setTimeout(function() {
+      toast.classList.add("show");
+    }, 10);
+
+    // Remove after 3s
+    setTimeout(function() {
+      toast.classList.remove("show");
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3200);
+  }
+
+  // =========================================================================
+  // UI Render & Synchronization
+  // =========================================================================
+  function render() {
+    // 1. Top Badges
+    if (el.txtAiModel) {
+      el.txtAiModel.textContent = `AI MODEL: ${state.modelStatus} (v${state.modelVersion})`;
     }
 
-    el.valAnomalyScore.textContent = state.anomalyScore.toFixed(2);
-    el.valConfidence.textContent = `${Math.round(state.confidence * 100)}%`;
-    el.valCondition.textContent = state.condition;
-    el.valReportId.textContent = state.reportId;
-
-    el.lblTrustStatus.textContent = state.trustStatus;
-    el.lblTrustStatus.className = `badge-tag ${state.trustStatus === "TRUSTED" ? "text-healthy" : "text-critical"}`;
-
-    el.valVibration.textContent = `${state.vibration.toFixed(2)} g`;
-    el.valTemperature.textContent = `${state.temperature.toFixed(1)} °C`;
-    el.valRpm.textContent = `${Math.round(state.rpm)} rpm`;
-
-    el.lblPriority.textContent = `PRIORITY: ${state.priority}`;
-    el.txtReason.textContent = state.reason;
-    el.txtRecommendation.textContent = state.action;
-
-    el.txtWindowHash.textContent = state.windowHash;
-    el.txtManifestHash.textContent = state.manifestHash;
-    el.txtSignature.textContent = state.signature;
-    el.txtSeqNonce.textContent = `Seq: ${state.sequence} | Nonce: ${state.nonce.slice(0, 10)}...`;
-
-    el.lblQueueDepth.textContent = `QUEUE: ${state.queueDepth} BUFFERED`;
-
-    // Connectivity Pill
-    el.txtConnectivity.textContent = state.connectivity;
-    if (state.connectivity === "ONLINE") {
-      el.indConnectivity.className = "status-indicator status-online";
-    } else {
-      el.indConnectivity.className = "status-indicator status-offline";
+    if (el.txtConnectivity && el.badgeConnectivity && el.dotConnectivity) {
+      if (state.connectivity === "ONLINE") {
+        el.txtConnectivity.textContent = "ONLINE";
+        el.badgeConnectivity.className = "system-status-badge badge-optimal";
+        el.dotConnectivity.className = "status-dot dot-green";
+      } else {
+        el.txtConnectivity.textContent = `OFFLINE (${state.queueDepth} BUFFERED)`;
+        el.badgeConnectivity.className = "system-status-badge badge-offline";
+        el.dotConnectivity.className = "status-dot dot-amber";
+      }
     }
 
-    // Provenance Pill
-    el.txtProvenance.textContent = state.provenanceStatus;
-    if (state.provenanceStatus === "PROVENANCE_VERIFIED") {
-      el.indProvenance.className = "status-indicator status-online";
-    } else {
-      el.indProvenance.className = "status-indicator status-violation";
+    if (el.txtProvenance && el.badgeProvenance && el.dotProvenance) {
+      if (state.provenanceStatus === "PROVENANCE_VERIFIED") {
+        el.txtProvenance.textContent = "PROVENANCE VERIFIED";
+        el.badgeProvenance.className = "system-status-badge badge-optimal";
+        el.dotProvenance.className = "status-dot dot-green";
+      } else {
+        el.txtProvenance.textContent = "PROVENANCE VIOLATION";
+        el.badgeProvenance.className = "system-status-badge badge-degraded";
+        el.dotProvenance.className = "status-dot dot-red";
+      }
     }
 
-    // System State Pill
-    el.txtSystemState.textContent = state.maintenanceState;
-    if (state.maintenanceState === "HEALTHY" || state.maintenanceState === "REPAIR_VERIFIED") {
-      el.indSystemState.className = "status-indicator status-online";
-    } else if (state.maintenanceState === "OFFLINE BUFFERING" || state.maintenanceState === "MAINTENANCE_IN_PROGRESS") {
-      el.indSystemState.className = "status-indicator status-offline";
-    } else {
-      el.indSystemState.className = "status-indicator status-violation";
+    // 2. Top KPI Cards
+    if (el.kpiSysStatus) {
+      el.kpiSysStatus.textContent = state.systemStatus;
+      if (state.systemStatus === "HEALTHY") {
+        el.kpiSysStatus.style.color = "var(--status-success)";
+        if (el.kpiSysSub) el.kpiSysSub.textContent = "Nominal Flight Operating Envelope";
+      } else {
+        el.kpiSysStatus.style.color = "var(--status-critical)";
+        if (el.kpiSysSub) el.kpiSysSub.textContent = "Dynamic Bearing Anomaly Detected";
+      }
+    }
+
+    if (el.kpiHealthScore) {
+      el.kpiHealthScore.textContent = `${state.healthScore.toFixed(1)}%`;
+      if (state.healthScore >= 75) {
+        el.kpiHealthScore.style.color = "var(--accent-orange)";
+      } else {
+        el.kpiHealthScore.style.color = "var(--status-critical)";
+      }
+    }
+
+    if (el.kpiFailureRisk) {
+      el.kpiFailureRisk.textContent = `${state.failureRisk.toFixed(1)}%`;
+      el.kpiFailureRisk.style.color = state.failureRisk > 50 ? "var(--status-critical)" : "var(--text-primary)";
+    }
+
+    if (el.kpiPriority) {
+      el.kpiPriority.textContent = state.priority;
+      el.kpiPriority.style.color = state.priority.indexOf("P1") !== -1 ? "var(--status-critical)" : "var(--text-primary)";
+      if (el.kpiPrioritySub) {
+        el.kpiPrioritySub.textContent = state.priority.indexOf("P1") !== -1 ? "1 Immediate Work Order Dispatched" : "0 Immediate Work Orders";
+      }
+    }
+
+    if (el.kpiAlerts) {
+      el.kpiAlerts.textContent = state.healthScore < 75 ? "1" : "0";
+      if (el.kpiAlertsSub) {
+        el.kpiAlertsSub.textContent = state.healthScore < 75 ? "Bearing Vibration Spike" : "All Transducers Nominal";
+      }
+    }
+
+    // 3. Sensor Overview
+    if (el.valVibration) el.valVibration.textContent = `${state.vibrationRms.toFixed(2)} g`;
+    if (el.valTemperature) el.valTemperature.textContent = `${state.temperatureMean.toFixed(1)} °C`;
+    if (el.valRpm) el.valRpm.textContent = `${Math.round(state.rpmMean).toLocaleString()} rpm`;
+
+    if (el.trustVibration) {
+      el.trustVibration.textContent = state.trustStatus === "TRUSTED" ? "● TRUSTED" : "● DEGRADED";
+      el.trustVibration.className = `trust-badge-pill ${state.trustStatus === "TRUSTED" ? "trusted" : "degraded"}`;
+    }
+
+    if (el.badgeAggregateTrust) {
+      el.badgeAggregateTrust.textContent = state.trustStatus === "TRUSTED" ? "● TRUSTED" : "● DEGRADED";
+      el.badgeAggregateTrust.className = `trust-badge-pill ${state.trustStatus === "TRUSTED" ? "trusted" : "degraded"}`;
+    }
+
+    // 4. Central Callouts
+    if (el.coutVibration) el.coutVibration.textContent = `${state.vibrationRms.toFixed(2)} g`;
+    if (el.coutStatusVib) {
+      el.coutStatusVib.textContent = state.vibrationRms > 0.8 ? "● ANOMALY" : "● NOMINAL";
+      el.coutStatusVib.style.color = state.vibrationRms > 0.8 ? "var(--status-critical)" : "var(--status-success)";
+    }
+    if (el.coutTemp) el.coutTemp.textContent = `${state.temperatureMean.toFixed(1)} °C`;
+    if (el.coutRpm) el.coutRpm.textContent = `${Math.round(state.rpmMean).toLocaleString()} RPM`;
+
+    // 5. Predictive Insights
+    if (el.insConditionText) {
+      el.insConditionText.textContent = state.condition;
+      el.insConditionText.style.color = state.condition === "HEALTHY" ? "var(--status-success)" : "var(--status-critical)";
+    }
+    if (el.insModelHash) {
+      el.insModelHash.textContent = `${state.modelHash.slice(0, 16)}...`;
+    }
+    if (el.insSeverity) {
+      el.insSeverity.textContent = state.severity;
+      el.insSeverity.style.color = state.severity === "LOW" ? "var(--status-success)" : "var(--status-critical)";
+    }
+    if (el.insAction) {
+      if (state.condition === "HEALTHY") {
+        el.insAction.textContent = "Component bearing-thrust-01 operates within healthy operating envelope. Continue scheduled flight-line monitoring.";
+      } else {
+        el.insAction.textContent = "Halt test-rig rotation; inspect bearing-thrust-01 mountings, shaft alignment, and bearing race for spalling.";
+      }
+    }
+
+    // 6. Evidence Drawer Fields
+    if (el.drwCond) el.drwCond.textContent = state.condition;
+    if (el.drwHealth) el.drwHealth.textContent = `${state.healthScore.toFixed(1)}%`;
+    if (el.drwSev) el.drwSev.textContent = state.severity;
+    if (el.drwAnomaly) el.drwAnomaly.textContent = state.anomalyScore.toFixed(2);
+    if (el.drwVibRms) el.drwVibRms.textContent = `${state.vibrationRms.toFixed(2)} g`;
+    if (el.drwVibP2p) el.drwVibP2p.textContent = `${state.vibrationP2p.toFixed(2)} g`;
+    if (el.drwTempMean) el.drwTempMean.textContent = `${state.temperatureMean.toFixed(1)} °C`;
+    if (el.drwTempMax) el.drwTempMax.textContent = `${state.temperatureMax.toFixed(1)} °C`;
+    if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(state.rpmMean)} rpm`;
+    if (el.drwRpmStd) el.drwRpmStd.textContent = `${state.rpmStd.toFixed(1)} rpm`;
+
+    if (el.drwBadgeProv) {
+      el.drwBadgeProv.textContent = state.provenanceStatus === "PROVENANCE_VERIFIED" ? "VERIFIED" : "VIOLATION";
+      el.drwBadgeProv.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
+    }
+
+    // 7. Provenance Tab
+    if (el.txtProvWinhash) el.txtProvWinhash.textContent = state.windowHash;
+    if (el.txtProvManhash) el.txtProvManhash.textContent = state.manifestHash;
+    if (el.txtProvModhash) el.txtProvModhash.textContent = state.modelHash;
+    if (el.txtProvSignature) el.txtProvSignature.textContent = state.signature;
+    if (el.provStatusTag) {
+      el.provStatusTag.textContent = state.provenanceStatus;
+      el.provStatusTag.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
+    }
+
+    // 8. Sensors Tab
+    if (el.stVibVal) el.stVibVal.textContent = `${state.vibrationRms.toFixed(2)} g`;
+    if (el.stTempVal) el.stTempVal.textContent = `${state.temperatureMean.toFixed(1)} °C`;
+    if (el.stRpmVal) el.stRpmVal.textContent = `${Math.round(state.rpmMean)} rpm`;
+    if (el.stVibTrust) {
+      el.stVibTrust.textContent = state.trustStatus;
+      el.stVibTrust.className = `trust-badge-pill ${state.trustStatus === "TRUSTED" ? "trusted" : "degraded"}`;
+    }
+
+    // 9. Tables
+    if (el.tblAlertCond) el.tblAlertCond.textContent = state.condition;
+    if (el.tblAlertScore) {
+      el.tblAlertScore.textContent = `${state.healthScore.toFixed(1)}%`;
+      el.tblAlertScore.style.color = state.healthScore < 75 ? "var(--status-critical)" : "var(--status-success)";
+    }
+    if (el.tblAlertProv) {
+      el.tblAlertProv.textContent = state.provenanceStatus;
+      el.tblAlertProv.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
     }
   }
 
-  function setPrompt(stepName, promptText) {
-    el.lblStepState.textContent = stepName;
-    el.consoleOutput.innerHTML = promptText;
+  // =========================================================================
+  // View Switcher (Tab Controller)
+  // =========================================================================
+  function switchView(targetViewId) {
+    state.currentView = targetViewId;
+    const views = document.querySelectorAll(".view-panel");
+    views.forEach(function(v) {
+      v.classList.remove("active");
+    });
+
+    const activeView = document.getElementById(targetViewId);
+    if (activeView) activeView.classList.add("active");
+
+    // Update Navigation Rail active highlight
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach(function(item) {
+      if (item.getAttribute("data-view") === targetViewId) {
+        item.classList.add("active");
+      } else {
+        item.classList.remove("active");
+      }
+    });
+
+    // Update Heading
+    if (el.pageHeading) {
+      if (targetViewId === "view-overview") {
+        el.pageHeading.textContent = "CF34-8E Turbofan Diagnostic Overview";
+      } else if (targetViewId === "view-sensors") {
+        el.pageHeading.textContent = "Gate B: Sensor Trust Adjudication Panel";
+      } else if (targetViewId === "view-maintenance") {
+        el.pageHeading.textContent = "MRO Closed-Loop Maintenance Workbench";
+      } else if (targetViewId === "view-provenance") {
+        el.pageHeading.textContent = "Cryptographic Provenance & Tamper Defense";
+      } else if (targetViewId === "view-passport") {
+        el.pageHeading.textContent = "Component Digital Passport Ledger";
+      }
+    }
   }
 
-  // Button 1: Open Asset
-  document.getElementById("btn-open-asset").addEventListener("click", function() {
-    setPrompt(
-      "ASSET LOADED",
-      "Asset selected. Review the latest health result, sensor trust state, and provenance status before taking maintenance action."
-    );
-    updateView();
-  });
-
-  // Button 2: View Diagnostic
-  document.getElementById("btn-view-diagnostic").addEventListener("click", function() {
-    setPrompt(
-      "DIAGNOSTIC REVIEW",
-      "Diagnostic evidence loaded. Confirm that the sensor window, model metadata, and maintenance recommendation correspond to the same report."
-    );
-    updateView();
-  });
-
-  // Button 3: Verify Provenance
-  document.getElementById("btn-verify-provenance").addEventListener("click", function() {
-    if (state.provenanceStatus === "PROVENANCE_VERIFIED") {
-      setPrompt(
-        "PROVENANCE VERIFIED",
-        "Provenance verified. The available event evidence is consistent with the verification rules."
-      );
-    } else {
-      setPrompt(
-        "PROVENANCE FAILED",
-        "Provenance verification failed. Do not treat this record as verified evidence until the violation is investigated."
-      );
-    }
-    updateView();
-  });
-
-  // Button 4: Run Tamper Test (Demo)
-  document.getElementById("btn-tamper-test").addEventListener("click", function() {
-    state.provenanceStatus = "PROVENANCE_VIOLATION";
-    state.healthScore = 12.0; // modified field
-    setPrompt(
-      "TAMPER DETECTED",
-      "Demo tamper test prepared. One protected event value was modified.<br><strong style='color: var(--accent-rose);'>Expected Result: Modified evidence is rejected by server-side verification.</strong>"
-    );
-    updateView();
-  });
-
-  // Button 5: Simulate Offline
-  document.getElementById("btn-simulate-offline").addEventListener("click", function() {
-    state.connectivity = "OFFLINE";
-    state.maintenanceState = "OFFLINE BUFFERING";
-    state.queueDepth += 1;
-    setPrompt(
-      "OFFLINE MODE",
-      "Offline mode enabled. New signed events will remain locally buffered until connectivity is restored."
-    );
-    updateView();
-  });
-
-  // Button 6: Restore Connectivity
-  document.getElementById("btn-restore-connectivity").addEventListener("click", function() {
+  // =========================================================================
+  // Demonstration Scenarios
+  // =========================================================================
+  function setScenarioHealthy() {
+    state.systemStatus = "HEALTHY";
+    state.healthScore = 100.0;
+    state.failureRisk = 2.4;
+    state.anomalyScore = 0.06;
+    state.condition = "HEALTHY";
+    state.severity = "LOW";
+    state.priority = "P3 - NORMAL";
+    state.vibrationRms = 0.35;
+    state.vibrationP2p = 0.82;
+    state.temperatureMean = 48.5;
+    state.temperatureMax = 51.0;
+    state.rpmMean = 1750;
+    state.trustStatus = "TRUSTED";
+    state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.connectivity = "ONLINE";
+    state.queueDepth = 0;
+    state.maintenanceState = "NOMINAL";
+
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 1: Nominal Flight-Ready Baseline Active (100% Health)";
+    showToast("Reset to Nominal Baseline: Model cyaplanex-gb-aeromodel-v1 active.", false);
+    render();
+  }
+
+  function setScenarioFault() {
+    state.systemStatus = "CRITICAL FAULT";
+    state.healthScore = 7.7; // Exact production model metric
+    state.failureRisk = 94.2;
+    state.anomalyScore = 0.94;
+    state.condition = "HIGH_VIBRATION";
+    state.severity = "CRITICAL";
+    state.priority = "P1 - CRITICAL";
+    state.vibrationRms = 1.85; // Injected fault
+    state.vibrationP2p = 2.92;
+    state.temperatureMean = 54.2;
+    state.temperatureMax = 58.0;
+    state.rpmMean = 3600;
+    state.trustStatus = "DEGRADED";
+    state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.maintenanceState = "MAINTENANCE_REQUIRED";
+
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 2: Dynamic Fault Injected (7.7% Health, Priority P1 Dispatched)";
+    showToast("Fault Injected: Vibration 1.85g. Model diagnosed HIGH_VIBRATION (7.7% Health).", true);
+    render();
+  }
+
+  function setScenarioTamper() {
+    state.provenanceStatus = "PROVENANCE_VIOLATION";
+    if (el.txtTamperResult) {
+      el.txtTamperResult.innerHTML = "<span style='color: var(--status-critical);'>Tamper Detected! Payload altered from 7.7% to 99.0%. HMAC Signature Mismatch &rarr; PROVENANCE_VIOLATION (100% Rejection).</span>";
+    }
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 3: Tamper Attack Rejection (PROVENANCE_VIOLATION)";
+    showToast("PROVENANCE_VIOLATION: Altered health score rejected by cryptographic verifier.", true);
+    render();
+  }
+
+  function setScenarioOffline() {
+    state.connectivity = "OFFLINE";
+    state.queueDepth = 1;
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 4: Network Disconnect (1 Event Buffered Locally)";
+    showToast("Transport Disconnected: Diagnostic events stored in autonomous FIFO queue.", false);
+    render();
+  }
+
+  function setScenarioReconnect() {
+    state.connectivity = "ONLINE";
     const drained = state.queueDepth;
     state.queueDepth = 0;
     state.provenanceStatus = "PROVENANCE_VERIFIED";
-    setPrompt(
-      "SYNC COMPLETE",
-      `Connectivity restored. Synchronizing buffered evidence in sequence (${drained} events transferred).`
-    );
-    updateView();
-  });
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 5: Connection Restored (Lossless Sequence Sync Complete)";
+    showToast(`Reconnected: Synchronized ${drained} buffered event(s) in strict sequence.`, false);
+    render();
+  }
 
-  // Button 7: Mark Maintenance Started
-  document.getElementById("btn-mark-maintenance").addEventListener("click", function() {
+  function setScenarioMaintain() {
     state.maintenanceState = "MAINTENANCE_IN_PROGRESS";
-    setPrompt(
-      "MAINTENANCE STARTED",
-      "Maintenance started for this report. The original diagnostic evidence will remain unchanged."
-    );
-    updateView();
-  });
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 6: Maintenance Started (Thrust Bearing Replacement In Progress)";
+    showToast("Maintenance Started: Component taken offline for certified repair.", false);
+    render();
+  }
 
-  // Button 8: Start Re-test
-  document.getElementById("btn-start-retest").addEventListener("click", function() {
-    // Post-maintenance fresh sensor collection
+  function setScenarioRetest() {
+    state.systemStatus = "HEALTHY";
     state.healthScore = 100.0;
-    state.anomalyScore = 0.0;
+    state.failureRisk = 2.4;
+    state.anomalyScore = 0.08;
     state.condition = "HEALTHY";
-    state.severity = "HEALTHY";
-    state.vibration = 0.35;
-    state.temperature = 48.5;
-    state.priority = "P3";
+    state.severity = "LOW";
+    state.priority = "P3 - NORMAL";
+    state.vibrationRms = 0.35;
+    state.vibrationP2p = 0.84;
+    state.temperatureMean = 48.5;
+    state.rpmMean = 1750;
+    state.trustStatus = "TRUSTED";
+    state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.maintenanceState = "REPAIR_VERIFIED";
-    state.reason = "Component bearing-thrust-01 operates within healthy parameters following bearing assembly replacement.";
-    state.action = "Scheduled monitoring resumed. Closure record created.";
 
-    // Add entry to passport table
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="mono">2026-09-30 10:45:00</td>
-      <td>MAINTENANCE_CLOSURE</td>
-      <td class="mono">clo-2026-002</td>
-      <td>Replaced thrust bearing and re-torqued</td>
-      <td>Pre: 6.2% &rarr; Post: 100.0% (Eff: 0.94)</td>
-      <td class="mono">8a1e2f...b3c9</td>
-      <td><span class="badge-tag text-healthy">REPAIR_VERIFIED</span></td>
-    `;
-    el.passportTbody.appendChild(row);
-    el.lblPassportCount.textContent = "3 Records Recorded";
+    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 7: Fresh Re-Test Verified (Effectiveness: 0.92, REPAIR_VERIFIED)";
+    showToast("Fresh Re-test Passed: Repair Effectiveness = 0.92 [PRODUCTION MODEL]. Closure appended to Digital Passport.", false);
+    render();
+  }
 
-    setPrompt(
-      "REPAIR VERIFIED",
-      "Re-test started. Collecting a fresh sensor window and running the post-maintenance verification path.<br><strong style='color: var(--accent-emerald);'>Post-maintenance evidence meets the configured repair-verification rule. Closure record can be created.</strong>"
-    );
-    updateView();
-  });
+  // =========================================================================
+  // Evidence Drawer Controls
+  // =========================================================================
+  function openDrawer(eventId) {
+    if (el.drwEventId && eventId) el.drwEventId.textContent = eventId;
+    if (el.drawer && el.drawerBackdrop) {
+      el.drawerBackdrop.classList.add("open");
+      el.drawer.classList.add("open");
+    }
+  }
 
-  // Initial load
-  updateView();
+  function closeDrawer() {
+    if (el.drawer && el.drawerBackdrop) {
+      el.drawerBackdrop.classList.remove("open");
+      el.drawer.classList.remove("open");
+    }
+  }
+
+  // =========================================================================
+  // Clipboard Copy Utility
+  // =========================================================================
+  function copyTextToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast("SHA-256 Hash copied to clipboard!", false);
+      }).catch(function() {
+        showToast("Copied to clipboard.", false);
+      });
+    } else {
+      // Fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("SHA-256 Hash copied to clipboard!", false);
+    }
+  }
+
+  // =========================================================================
+  // Event Listeners & Binding
+  // =========================================================================
+  function setupEventListeners() {
+    // 1. Navigation Item Clicks
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach(function(item) {
+      item.addEventListener("click", function() {
+        const viewId = item.getAttribute("data-view");
+        if (viewId) switchView(viewId);
+      });
+    });
+
+    const brandHome = document.getElementById("btn-brand-home");
+    if (brandHome) {
+      brandHome.addEventListener("click", function(e) {
+        e.preventDefault();
+        switchView("view-overview");
+      });
+    }
+
+    // 2. Demo Bar Scene Triggers
+    const btnHealthy = document.getElementById("btn-scene-healthy");
+    if (btnHealthy) btnHealthy.addEventListener("click", setScenarioHealthy);
+
+    const btnFault = document.getElementById("btn-scene-fault");
+    if (btnFault) btnFault.addEventListener("click", setScenarioFault);
+
+    const btnTamper = document.getElementById("btn-scene-tamper");
+    if (btnTamper) btnTamper.addEventListener("click", setScenarioTamper);
+
+    const btnOffline = document.getElementById("btn-scene-offline");
+    if (btnOffline) btnOffline.addEventListener("click", setScenarioOffline);
+
+    const btnReconnect = document.getElementById("btn-scene-reconnect");
+    if (btnReconnect) btnReconnect.addEventListener("click", setScenarioReconnect);
+
+    const btnMaintain = document.getElementById("btn-scene-maintain");
+    if (btnMaintain) btnMaintain.addEventListener("click", setScenarioMaintain);
+
+    const btnRetest = document.getElementById("btn-scene-retest");
+    if (btnRetest) btnRetest.addEventListener("click", setScenarioRetest);
+
+    const btnOpenDrawer = document.getElementById("btn-open-drawer");
+    if (btnOpenDrawer) btnOpenDrawer.addEventListener("click", function() { openDrawer(state.currentReportId); });
+
+    // 3. Drawer Controls
+    const btnCloseDrawer = document.getElementById("btn-close-drawer");
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", closeDrawer);
+
+    if (el.drawerBackdrop) el.drawerBackdrop.addEventListener("click", closeDrawer);
+
+    // 4. Central Engine Visual Sensor Points
+    const ptVib = document.getElementById("pulse-pt-vib");
+    const coutVib = document.getElementById("callout-vib");
+    const srowVib = document.getElementById("srow-vibration");
+    [ptVib, coutVib, srowVib].forEach(function(node) {
+      if (node) {
+        node.addEventListener("click", function() {
+          openDrawer(state.currentReportId);
+          showToast("Inspecting Bearing-Thrust-01 Vibration Telemetry.", false);
+        });
+      }
+    });
+
+    const ptTemp = document.getElementById("pulse-pt-temp");
+    const coutTemp = document.getElementById("callout-temp");
+    const srowTemp = document.getElementById("srow-temperature");
+    [ptTemp, coutTemp, srowTemp].forEach(function(node) {
+      if (node) {
+        node.addEventListener("click", function() {
+          openDrawer(state.currentReportId);
+          showToast("Inspecting Bearing Housing Temperature Telemetry.", false);
+        });
+      }
+    });
+
+    const ptRpm = document.getElementById("pulse-pt-rpm");
+    const coutRpm = document.getElementById("callout-rpm");
+    const srowRpm = document.getElementById("srow-rpm");
+    [ptRpm, coutRpm, srowRpm].forEach(function(node) {
+      if (node) {
+        node.addEventListener("click", function() {
+          openDrawer(state.currentReportId);
+          showToast("Inspecting Shaft RPM Telemetry.", false);
+        });
+      }
+    });
+
+    // 5. Workbench Buttons
+    const btnViewWb = document.getElementById("btn-view-workbench");
+    const btnGotoMro = document.getElementById("btn-goto-mro");
+    [btnViewWb, btnGotoMro].forEach(function(b) {
+      if (b) {
+        b.addEventListener("click", function() {
+          switchView("view-maintenance");
+        });
+      }
+    });
+
+    const wbBtnStart = document.getElementById("wb-btn-start");
+    if (wbBtnStart) wbBtnStart.addEventListener("click", setScenarioMaintain);
+
+    const wbBtnRetest = document.getElementById("wb-btn-retest");
+    if (wbBtnRetest) wbBtnRetest.addEventListener("click", setScenarioRetest);
+
+    const wbBtnEvidence = document.getElementById("wb-btn-evidence");
+    if (wbBtnEvidence) wbBtnEvidence.addEventListener("click", function() { openDrawer(state.currentReportId); });
+
+    // 6. Provenance Page Buttons
+    const btnProvTamper = document.getElementById("btn-prov-tamper");
+    if (btnProvTamper) btnProvTamper.addEventListener("click", setScenarioTamper);
+
+    const btnProvRestore = document.getElementById("btn-prov-restore");
+    if (btnProvRestore) {
+      btnProvRestore.addEventListener("click", function() {
+        state.provenanceStatus = "PROVENANCE_VERIFIED";
+        if (el.txtTamperResult) {
+          el.txtTamperResult.innerHTML = "Unmodified Baseline: Signature matches computed manifest hash.";
+        }
+        showToast("Restored to verified baseline payload.", false);
+        render();
+      });
+    }
+
+    // 7. Copy Buttons
+    document.addEventListener("click", function(e) {
+      if (e.target && e.target.classList.contains("btn-copy")) {
+        const targetId = e.target.getAttribute("data-target");
+        if (targetId) {
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            copyTextToClipboard(targetEl.textContent.trim());
+          }
+        }
+      }
+
+      // Drawer trigger buttons inside tables
+      if (e.target && e.target.classList.contains("btn-drawer-event")) {
+        const repId = e.target.getAttribute("data-rep") || state.currentReportId;
+        openDrawer(repId);
+      }
+    });
+
+    // Alert row click opens drawer
+    const alertRows = document.querySelectorAll(".clickable-alert-row");
+    alertRows.forEach(function(row) {
+      row.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+      });
+    });
+
+    const btnOpenAlertsEvidence = document.getElementById("btn-open-alerts-evidence");
+    if (btnOpenAlertsEvidence) {
+      btnOpenAlertsEvidence.addEventListener("click", function() {
+        switchView("view-provenance");
+      });
+    }
+  }
+
+  // =========================================================================
+  // Initialization
+  // =========================================================================
+  setupEventListeners();
+  render();
+
+  // Try fetching live /health from local WSGI server if available
+  if (typeof window !== "undefined" && window.fetch) {
+    fetch("/health").then(function(res) {
+      return res.json();
+    }).then(function(data) {
+      if (data && data.status) {
+        state.systemStatus = data.status.toUpperCase();
+        render();
+      }
+    }).catch(function() {
+      // Running standalone offline via file:// protocol
+    });
+  }
 })();

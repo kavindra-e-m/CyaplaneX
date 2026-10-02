@@ -3,197 +3,1193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="CyaplaneX - Trusted Closed-Loop Edge AI Predictive Maintenance & Aircraft Health Monitoring">
-  <title>CyaplaneX — Aircraft Predictive Maintenance & Provenance Dashboard</title>
+  <meta name="description" content="CyaplaneX - Enterprise Aerospace Predictive Maintenance & Aircraft Health Monitoring Platform">
+  <title>CyaplaneX — Aircraft Engine Predictive Maintenance & Provenance Platform</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="dashboard-container">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-title">
-        <h1>CyaplaneX <span class="badge-tag">Tata InnoVent 2026</span></h1>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
-          Trusted Closed-Loop Edge AI Predictive Maintenance & Aircraft Health Monitoring
-        </p>
-      </div>
-      <div class="system-status-pills">
-        <div class="status-pill" id="pill-system-state">
-          <span class="status-indicator status-online" id="ind-system-state"></span>
-          <span id="txt-system-state">HEALTHY</span>
+  <div class="app-shell">
+    <!-- Left Navigation Rail (Narrow Dark Rail) -->
+    <aside class="nav-rail" aria-label="Primary Navigation">
+      <a href="#" class="brand-mark" id="btn-brand-home" title="CyaplaneX Aerospace Systems">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v18M3 12h18M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+          </svg>
         </div>
-        <div class="status-pill" id="pill-connectivity">
-          <span class="status-indicator status-online" id="ind-connectivity"></span>
-          <span id="txt-connectivity">ONLINE</span>
-        </div>
-        <div class="status-pill" id="pill-provenance">
-          <span class="status-indicator status-online" id="ind-provenance"></span>
-          <span id="txt-provenance">PROVENANCE VERIFIED</span>
-        </div>
-      </div>
-    </header>
+        <span class="brand-text">CYAPLANEX</span>
+      </a>
 
-    <!-- Master Action Toolbar -->
-    <section class="toolbar-card">
-      <h3>Interactive Engineering Actions</h3>
-      <div class="toolbar-buttons">
-        <button class="btn btn-primary" id="btn-open-asset">Open Asset</button>
-        <button class="btn btn-secondary" id="btn-view-diagnostic">View Diagnostic</button>
-        <button class="btn btn-secondary" id="btn-verify-provenance">Verify Provenance</button>
-        <button class="btn btn-danger" id="btn-tamper-test">Run Tamper Test</button>
-        <button class="btn btn-warning" id="btn-simulate-offline">Simulate Offline</button>
-        <button class="btn btn-success" id="btn-restore-connectivity">Restore Connectivity</button>
-        <button class="btn btn-warning" id="btn-mark-maintenance">Mark Maintenance Started</button>
-        <button class="btn btn-primary" id="btn-start-retest">Start Re-test</button>
-      </div>
-    </section>
+      <nav class="nav-stack">
+        <button class="nav-item active" data-view="view-overview" id="nav-overview" title="Dashboard Overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+          <span class="nav-label">Overview</span>
+        </button>
 
-    <!-- Workflow Guidance Console -->
-    <section class="card col-12" style="padding: 16px 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">
-          Operator Guidance & Execution Prompt
-        </span>
-        <span id="lbl-step-state" class="badge-tag">STEP READY</span>
-      </div>
-      <div class="console-box" id="console-output">
-        System initialized. Select "Open Asset" or "View Diagnostic" to review latest telemetry and health evidence.
-      </div>
-    </section>
+        <button class="nav-item" data-view="view-sensors" id="nav-sensors" title="Sensors & Trust Gating">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="nav-label">Sensors</span>
+        </button>
 
-    <!-- Main Grid -->
-    <div class="dashboard-grid">
-      <!-- Left Column: Asset & Health -->
-      <div class="card col-6">
-        <div class="card-header">
-          <h2 class="card-title">Asset & AI Diagnostic Overview</h2>
-          <span class="badge-tag" id="lbl-component">bearing-thrust-01</span>
-        </div>
-        <div class="metric-row">
-          <div class="metric-box">
-            <div class="metric-label">Health Score</div>
-            <div class="metric-val text-critical" id="val-health-score">6.2%</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Anomaly Score</div>
-            <div class="metric-val" id="val-anomaly-score">0.94</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Confidence</div>
-            <div class="metric-val" id="val-confidence">94%</div>
-          </div>
-        </div>
+        <button class="nav-item" data-view="view-maintenance" id="nav-maintenance" title="Maintenance Workbench">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <span class="nav-label">MRO Tasks</span>
+        </button>
 
-        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
-          <div><strong style="color: var(--text-secondary);">Asset Target:</strong> <span id="val-asset-id">aircraft-wing-lh</span></div>
-          <div><strong style="color: var(--text-secondary);">Condition Flag:</strong> <span id="val-condition" style="font-weight: 600;">HEALTHY</span></div>
-          <div><strong style="color: var(--text-secondary);">Report Reference:</strong> <span class="mono" id="val-report-id">rep-2026-init</span></div>
-          <div><strong style="color: var(--text-secondary);">Active Model:</strong> <span class="mono" id="val-model-meta">cyaplanex-baseline-eval-v1 (v1.0.0)</span></div>
+        <button class="nav-item" data-view="view-provenance" id="nav-provenance" title="Cryptographic Provenance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <span class="nav-label">Provenance</span>
+        </button>
+
+        <button class="nav-item" data-view="view-passport" id="nav-passport" title="Component Digital Passport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            <path d="M12 6v6m-3-3h6"/>
+          </svg>
+          <span class="nav-label">Passport</span>
+        </button>
+      </nav>
+
+      <div class="nav-footer">
+        <div class="user-avatar" title="Authenticated: MRO Chief Engineer (Civil Airworthiness)">
+          CE
         </div>
       </div>
+    </aside>
 
-      <!-- Right Column: Sensor Trust -->
-      <div class="card col-6">
-        <div class="card-header">
-          <h2 class="card-title">Sensor Trust Engine (Gate B)</h2>
-          <span class="badge-tag text-healthy" id="lbl-trust-status">TRUSTED</span>
-        </div>
-        <div class="metric-row">
-          <div class="metric-box">
-            <div class="metric-label">Vibration (RMS)</div>
-            <div class="metric-val" id="val-vibration">0.35 g</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Temperature</div>
-            <div class="metric-val" id="val-temperature">52.4 °C</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Shaft RPM</div>
-            <div class="metric-val" id="val-rpm">3605 rpm</div>
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 class="page-title" id="page-heading">CF34-8E Turbofan Diagnostic Overview</h1>
+          <div class="page-subtitle">
+            <span>Asset: <strong style="color: var(--text-primary);">aircraft-wing-lh</strong></span>
+            <span>•</span>
+            <span>Target: <strong style="color: var(--text-primary);">bearing-thrust-01</strong></span>
+            <span>•</span>
+            <span id="txt-engine-sub">Turbofan Engine S/N: AIRC-CF34-01</span>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.85rem;">
-          <div><strong style="color: var(--text-secondary);">Range Check:</strong> <span id="chk-range" style="color: var(--accent-emerald);">PASSED</span></div>
-          <div><strong style="color: var(--text-secondary);">Data Freshness:</strong> <span id="chk-fresh" style="color: var(--accent-emerald);">PASSED</span></div>
-          <div><strong style="color: var(--text-secondary);">Stuck Detector:</strong> <span id="chk-stuck" style="color: var(--accent-emerald);">NO STUCK VALS</span></div>
-          <div><strong style="color: var(--text-secondary);">Consensus Score:</strong> <span id="chk-consensus" class="mono">1.00</span></div>
-        </div>
-      </div>
-
-      <!-- Maintenance Reasoning Panel -->
-      <div class="card col-6">
-        <div class="card-header">
-          <h2 class="card-title">Maintenance Reasoning & Decision (Gate F/G)</h2>
-          <span class="badge-tag" id="lbl-priority">PRIORITY: P3</span>
-        </div>
-        <div style="font-size: 0.9rem; line-height: 1.6;">
-          <div style="margin-bottom: 8px;">
-            <strong style="color: var(--text-secondary); display: block;">Maintenance Reason:</strong>
-            <span id="txt-reason">Component bearing-thrust-01 operates within expected parameters with TRUSTED sensor evidence.</span>
-          </div>
-          <div>
-            <strong style="color: var(--text-secondary); display: block;">Recommended Action:</strong>
-            <span id="txt-recommendation">Continue scheduled monitoring for bearing-thrust-01.</span>
+        <div class="header-center">
+          <div class="filter-pill">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>Live Telemetry • Flight-Line Stream</span>
           </div>
         </div>
-      </div>
 
-      <!-- Provenance & Offline Buffering Panel -->
-      <div class="card col-6">
-        <div class="card-header">
-          <h2 class="card-title">Cryptographic Provenance & Offline Queue</h2>
-          <span class="badge-tag" id="lbl-queue-depth">QUEUE: 0 BUFFERED</span>
-        </div>
-        <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
-          <div><strong style="color: var(--text-secondary);">Sensor Window Hash:</strong> <span class="mono" id="txt-window-hash" style="word-break: break-all;">9f83c6...79ac4f</span></div>
-          <div><strong style="color: var(--text-secondary);">Manifest Hash:</strong> <span class="mono" id="txt-manifest-hash" style="word-break: break-all;">6b86b2...75b4b</span></div>
-          <div><strong style="color: var(--text-secondary);">Digital Signature:</strong> <span class="mono" id="txt-signature" style="word-break: break-all;">hmac-sha256:d8a1...</span></div>
-          <div><strong style="color: var(--text-secondary);">Sequence No / Nonce:</strong> <span class="mono" id="txt-seq-nonce">Seq: 1 | Nonce: n-550e84</span></div>
-        </div>
-      </div>
+        <div class="header-right">
+          <div class="system-status-badge badge-optimal" id="badge-ai-model">
+            <span class="status-dot dot-green" id="dot-ai-model"></span>
+            <span id="txt-ai-model">AI MODEL: OPTIMAL (v1.0.0)</span>
+          </div>
 
-      <!-- Component Digital Passport Table -->
-      <div class="card col-12">
-        <div class="card-header">
-          <h2 class="card-title">Component Digital Passport & Lifecycle Records</h2>
-          <span class="badge-tag" id="lbl-passport-count">2 Records Recorded</span>
+          <div class="system-status-badge badge-optimal" id="badge-connectivity">
+            <span class="status-dot dot-green" id="dot-connectivity"></span>
+            <span id="txt-connectivity">ONLINE</span>
+          </div>
+
+          <div class="system-status-badge badge-optimal" id="badge-provenance">
+            <span class="status-dot dot-green" id="dot-provenance"></span>
+            <span id="txt-provenance">PROVENANCE VERIFIED</span>
+          </div>
         </div>
-        <table class="passport-table">
-          <thead>
-            <tr>
-              <th>Timestamp (UTC)</th>
-              <th>Record Type</th>
-              <th>Reference ID</th>
-              <th>Condition / Action</th>
-              <th>Health Evidence</th>
-              <th>Provenance Hash</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="passport-tbody">
-            <tr>
-              <td class="mono">2026-09-30 09:15:00</td>
-              <td>DIAGNOSTIC_EVENT</td>
-              <td class="mono">rep-demo-002</td>
-              <td>HIGH_VIBRATION</td>
-              <td>Health: 6.2% | Anomaly: 0.94</td>
-              <td class="mono">2af081...3908</td>
-              <td><span class="badge-tag text-healthy">VERIFIED</span></td>
-            </tr>
-            <tr>
-              <td class="mono">2026-09-30 10:20:00</td>
-              <td>MAINTENANCE_CLOSURE</td>
-              <td class="mono">clo-2026-001</td>
-              <td>Replaced thrust bearing and re-torqued</td>
-              <td>Pre: 6.2% &rarr; Post: 100.0% (Eff: 0.94)</td>
-              <td class="mono">e03092...23d8</td>
-              <td><span class="badge-tag text-healthy">REPAIR_VERIFIED</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </header>
+
+      <!-- Interactive Demonstration Action Bar -->
+      <section class="demo-bar" aria-label="Demonstration Controls">
+        <div class="demo-bar-left">
+          <span class="demo-tag">DEMO WORKFLOW</span>
+          <span class="demo-step-label" id="lbl-demo-status">Step 1: Nominal Flight-Ready Baseline</span>
+        </div>
+
+        <div class="demo-bar-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-scene-healthy" title="Reset to Nominal Baseline">
+            1. Healthy Baseline
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-scene-fault" title="Inject Bearing Vibration Spike">
+            2. Inject Fault
+          </button>
+          <button class="btn btn-danger btn-sm" id="btn-scene-tamper" title="Simulate Unauthorized Payload Alteration">
+            3. Tamper Attack
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-scene-offline" title="Simulate Network Disconnect">
+            4. Offline Disconnect
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-scene-reconnect" title="Restore Network & Sync">
+            5. Reconnect & Sync
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-scene-maintain" title="Mark Maintenance Started">
+            6. Start Repair
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-scene-retest" title="Acquire Fresh Telemetry & Verify Repair">
+            7. Fresh Re-Test
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-open-drawer" title="Inspect Full Cryptographic Evidence">
+            Evidence Drawer &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- Content Body -->
+      <main class="content-body">
+        
+        <!-- ====================================================================
+             VIEW 1: OVERVIEW DASHBOARD
+             ==================================================================== -->
+        <div class="view-panel active" id="view-overview">
+          
+          <!-- Top 5 KPI Cards -->
+          <section class="kpi-row" aria-label="Key Performance Indicators">
+            <!-- KPI 1: System Status -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">System Status</span>
+                <div class="kpi-icon" id="icon-sys-status">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-sys-status" style="color: var(--status-success);">HEALTHY</span>
+              </div>
+              <div class="kpi-subtext" id="kpi-sys-sub">Nominal Flight Envelope</div>
+            </div>
+
+            <!-- KPI 2: Health Score -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Health Score</span>
+                <div class="kpi-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value accent-orange" id="kpi-health-score">100.0%</span>
+              </div>
+              <div class="kpi-subtext">Baseline Threshold: &ge; 75.0%</div>
+            </div>
+
+            <!-- KPI 3: Failure Probability -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Failure Risk (30-Day)</span>
+                <div class="kpi-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-failure-risk">2.4%</span>
+              </div>
+              <div class="kpi-subtext">Low Severity Assessment</div>
+            </div>
+
+            <!-- KPI 4: Maintenance Priority -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Maintenance Priority</span>
+                <div class="kpi-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-priority">P3 - NORMAL</span>
+              </div>
+              <div class="kpi-subtext" id="kpi-priority-sub">0 Immediate Work Orders</div>
+            </div>
+
+            <!-- KPI 5: Active Alerts -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Active Alerts</span>
+                <div class="kpi-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpi-alerts">0</span>
+              </div>
+              <div class="kpi-subtext" id="kpi-alerts-sub">All Transducers Nominal</div>
+            </div>
+          </section>
+
+          <!-- Central Workspace: 3-Column Architecture -->
+          <section class="monitoring-grid">
+            <!-- Left: Sensor Overview Panel -->
+            <div class="card">
+              <div class="card-title-row">
+                <div>
+                  <h2 class="card-title">Sensor Channels &amp; Trust</h2>
+                  <p class="card-subtitle">Gate B Multi-Sensor Adjudication</p>
+                </div>
+                <span class="trust-badge-pill trusted" id="badge-aggregate-trust">● TRUSTED</span>
+              </div>
+
+              <div class="sensor-list">
+                <!-- Row 1: Vibration -->
+                <div class="sensor-row" id="srow-vibration" title="Inspect ADXL345 Accelerometer Telemetry">
+                  <div class="sensor-info">
+                    <div class="sensor-icon-box">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12h3l3-9 4 18 3-9h3"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="sensor-name">Vibration (Radial)</div>
+                      <div class="sensor-meta">ADXL345 • Bearing Cap</div>
+                    </div>
+                  </div>
+                  <div class="sensor-measurements">
+                    <svg class="sparkline-svg" viewBox="0 0 50 20">
+                      <path d="M 0,10 Q 12,5 25,10 T 50,10" fill="none" stroke="var(--accent-orange)" stroke-width="2"/>
+                    </svg>
+                    <div>
+                      <div class="sensor-val" id="val-vibration">0.35 g</div>
+                      <span class="trust-badge-pill trusted" id="trust-vibration">● TRUSTED</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 2: Temperature -->
+                <div class="sensor-row" id="srow-temperature" title="Inspect MAX6675 Thermocouple Telemetry">
+                  <div class="sensor-info">
+                    <div class="sensor-icon-box">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="sensor-name">Temperature</div>
+                      <div class="sensor-meta">MAX6675 • Housing</div>
+                    </div>
+                  </div>
+                  <div class="sensor-measurements">
+                    <svg class="sparkline-svg" viewBox="0 0 50 20">
+                      <path d="M 0,15 L 20,12 L 35,10 L 50,8" fill="none" stroke="#D97706" stroke-width="2"/>
+                    </svg>
+                    <div>
+                      <div class="sensor-val" id="val-temperature">48.5 °C</div>
+                      <span class="trust-badge-pill trusted" id="trust-temperature">● TRUSTED</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 3: Speed / RPM -->
+                <div class="sensor-row" id="srow-rpm" title="Inspect A3144 Hall-Effect RPM Telemetry">
+                  <div class="sensor-info">
+                    <div class="sensor-icon-box">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="9"/>
+                        <polyline points="12 6 12 12 14 14"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="sensor-name">Shaft Rotational Speed</div>
+                      <div class="sensor-meta">A3144 • Main Rotor</div>
+                    </div>
+                  </div>
+                  <div class="sensor-measurements">
+                    <svg class="sparkline-svg" viewBox="0 0 50 20">
+                      <path d="M 0,10 L 15,10 L 30,10 L 50,10" fill="none" stroke="#0284C7" stroke-width="2"/>
+                    </svg>
+                    <div>
+                      <div class="sensor-val" id="val-rpm">1,750 rpm</div>
+                      <span class="trust-badge-pill trusted" id="trust-rpm">● TRUSTED</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 4: Lubrication Oil Pressure -->
+                <div class="sensor-row" id="srow-pressure" title="Inspect Housing Stability">
+                  <div class="sensor-info">
+                    <div class="sensor-icon-box">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="sensor-name">Scavenge Oil Pressure</div>
+                      <div class="sensor-meta">Secondary Pump Line</div>
+                    </div>
+                  </div>
+                  <div class="sensor-measurements">
+                    <svg class="sparkline-svg" viewBox="0 0 50 20">
+                      <path d="M 0,10 L 25,9 L 50,10" fill="none" stroke="#10B981" stroke-width="2"/>
+                    </svg>
+                    <div>
+                      <div class="sensor-val" id="val-pressure">72.4 PSI</div>
+                      <span class="trust-badge-pill trusted">● TRUSTED</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Center: Central Aircraft Engine Visual -->
+            <div class="card engine-visual-card">
+              <div class="card-title-row" style="width: 100%; margin-bottom: 0;">
+                <div>
+                  <h2 class="card-title">Aerospace Turbofan Technical Schematic</h2>
+                  <p class="card-subtitle">CF34-8E Radial Bearing &amp; Core Assembly</p>
+                </div>
+                <div class="filter-pill" style="font-size: 11px; padding: 4px 10px;">
+                  Model: AIRC-CF34-01
+                </div>
+              </div>
+
+              <!-- Engine Schematic Canvas -->
+              <div class="engine-canvas-container">
+                <!-- High-Quality Technical Turbofan Schematic SVG -->
+                <svg class="engine-svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+                  <defs>
+                    <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#E2E8F0"/>
+                      <stop offset="100%" stop-color="#CBD5E1"/>
+                    </linearGradient>
+                    <linearGradient id="housingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#F8FAFC"/>
+                      <stop offset="100%" stop-color="#EEF2F6"/>
+                    </linearGradient>
+                    <pattern id="gridPat" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#F1F5F9" stroke-width="1"/>
+                    </pattern>
+                  </defs>
+
+                  <!-- Background Technical Grid -->
+                  <rect width="800" height="400" fill="url(#gridPat)"/>
+
+                  <!-- Center Shaft Axis (Dashed Centerline) -->
+                  <line x1="40" y1="200" x2="760" y2="200" stroke="#94A3B8" stroke-dasharray="8 4" stroke-width="1.2"/>
+
+                  <!-- Outer Nacelle Cowling -->
+                  <path d="M 80,110 C 140,85 240,75 400,75 C 560,75 660,95 720,130 L 720,160 C 660,130 560,115 400,115 C 240,115 140,125 80,140 Z" fill="url(#housingGrad)" stroke="#64748B" stroke-width="1.8"/>
+                  <path d="M 80,290 C 140,315 240,325 400,325 C 560,325 660,305 720,270 L 720,240 C 660,270 560,285 400,285 C 240,285 140,275 80,260 Z" fill="url(#housingGrad)" stroke="#64748B" stroke-width="1.8"/>
+
+                  <!-- Spinner Cone -->
+                  <path d="M 80,200 C 100,175 140,165 170,165 L 170,235 C 140,235 100,225 80,200 Z" fill="#E2E8F0" stroke="#475569" stroke-width="2"/>
+
+                  <!-- Fan Stage Rotor Blades -->
+                  <g stroke="#334155" stroke-width="1.5" fill="url(#bladeGrad)">
+                    <rect x="170" y="80" width="18" height="240" rx="3"/>
+                    <rect x="194" y="90" width="14" height="220" rx="2"/>
+                    <rect x="214" y="98" width="12" height="204" rx="2"/>
+                  </g>
+
+                  <!-- Low Pressure / High Pressure Compressor -->
+                  <g fill="#F1F5F9" stroke="#64748B" stroke-width="1.2">
+                    <rect x="238" y="125" width="10" height="150" rx="2"/>
+                    <rect x="254" y="130" width="10" height="140" rx="2"/>
+                    <rect x="270" y="135" width="10" height="130" rx="2"/>
+                    <rect x="286" y="140" width="10" height="120" rx="2"/>
+                    <rect x="302" y="145" width="10" height="110" rx="2"/>
+                  </g>
+
+                  <!-- Central Shaft -->
+                  <rect x="170" y="190" width="460" height="20" fill="#CBD5E1" stroke="#475569" stroke-width="1.5"/>
+
+                  <!-- TARGET BEARING ASSEMBLY (Bearing-Thrust-01) -->
+                  <g id="svg-bearing-assembly" style="cursor: pointer;">
+                    <!-- Pillow-block housing -->
+                    <rect x="325" y="165" width="50" height="70" rx="4" fill="#FFFFFF" stroke="var(--accent-orange)" stroke-width="2.5"/>
+                    <!-- Ball bearings -->
+                    <circle cx="338" cy="178" r="6" fill="#F97316"/>
+                    <circle cx="362" cy="178" r="6" fill="#F97316"/>
+                    <circle cx="338" cy="222" r="6" fill="#F97316"/>
+                    <circle cx="362" cy="222" r="6" fill="#F97316"/>
+                    <text x="350" y="204" font-size="8" font-family="sans-serif" font-weight="700" fill="#0F172A" text-anchor="middle">THRUST</text>
+                  </g>
+
+                  <!-- Combustion Chamber Section -->
+                  <path d="M 390,140 L 470,145 L 470,165 L 390,160 Z" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+                  <path d="M 390,260 L 470,255 L 470,235 L 390,240 Z" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+
+                  <!-- High Pressure / Low Pressure Turbine Stages -->
+                  <g fill="#CBD5E1" stroke="#334155" stroke-width="1.5">
+                    <rect x="480" y="130" width="14" height="140" rx="2"/>
+                    <rect x="500" y="125" width="16" height="150" rx="2"/>
+                    <rect x="522" y="120" width="18" height="160" rx="2"/>
+                  </g>
+
+                  <!-- Tail Cone / Exhaust Nozzle -->
+                  <path d="M 630,175 C 670,185 710,195 730,200 C 710,205 670,215 630,225 Z" fill="#E2E8F0" stroke="#64748B" stroke-width="1.5"/>
+
+                  <!-- Interactive Sensor Points -->
+                  <!-- Sensor Point A: Thrust Bearing Vibration (ADXL345) -->
+                  <g id="pulse-pt-vib" class="sensor-pulse-group" style="cursor: pointer;">
+                    <circle cx="350" cy="165" r="14" fill="rgba(255, 106, 0, 0.2)"/>
+                    <circle cx="350" cy="165" r="6" fill="var(--accent-orange)" stroke="#FFFFFF" stroke-width="2"/>
+                  </g>
+
+                  <!-- Sensor Point B: Bearing Temperature (MAX6675) -->
+                  <g id="pulse-pt-temp" class="sensor-pulse-group" style="cursor: pointer;">
+                    <circle cx="430" cy="150" r="12" fill="rgba(217, 119, 6, 0.2)"/>
+                    <circle cx="430" cy="150" r="5" fill="#D97706" stroke="#FFFFFF" stroke-width="2"/>
+                  </g>
+
+                  <!-- Sensor Point C: Shaft RPM (A3144) -->
+                  <g id="pulse-pt-rpm" class="sensor-pulse-group" style="cursor: pointer;">
+                    <circle cx="210" cy="200" r="12" fill="rgba(2, 132, 199, 0.2)"/>
+                    <circle cx="210" cy="200" r="5" fill="#0284C7" stroke="#FFFFFF" stroke-width="2"/>
+                  </g>
+                </svg>
+
+                <!-- Thin Orange Connector Callout Overlays -->
+                <!-- Callout 1: Vibration -->
+                <div class="engine-callout callout-vibration" id="callout-vib" title="Click to view Thrust Bearing evidence">
+                  <span class="callout-label">ADXL345 • Thrust Bearing</span>
+                  <span class="callout-val" id="cout-vibration">0.35 g</span>
+                  <span class="callout-status" id="cout-status-vib">● NOMINAL</span>
+                </div>
+
+                <!-- Callout 2: Temperature -->
+                <div class="engine-callout callout-temperature" id="callout-temp" title="Click to view Temperature evidence">
+                  <span class="callout-label">MAX6675 • Bearing Cap</span>
+                  <span class="callout-val" id="cout-temp">48.5 °C</span>
+                  <span class="callout-status" id="cout-status-temp">● NOMINAL</span>
+                </div>
+
+                <!-- Callout 3: Shaft RPM -->
+                <div class="engine-callout callout-rpm" id="callout-rpm" title="Click to view Speed evidence">
+                  <span class="callout-label">A3144 • Rotor Shaft</span>
+                  <span class="callout-val" id="cout-rpm">1,750 RPM</span>
+                  <span class="callout-status" id="cout-status-rpm">● NOMINAL</span>
+                </div>
+
+                <!-- Callout 4: Scavenge Pressure -->
+                <div class="engine-callout callout-pressure" id="callout-press">
+                  <span class="callout-label">Scavenge Line</span>
+                  <span class="callout-val">72.4 PSI</span>
+                  <span class="callout-status">● OPTIMAL</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Predictive Insights Panel -->
+            <div class="card insights-card">
+              <div>
+                <div class="card-title-row">
+                  <div>
+                    <h2 class="card-title">Predictive Insights</h2>
+                    <p class="card-subtitle">Gate D Production ML Evaluation</p>
+                  </div>
+                  <span class="badge-tag" style="background: var(--surface-subtle); color: var(--text-secondary); border: 1px solid var(--border-subtle); font-size: 11px;">
+                    scikit-learn / ONNX
+                  </span>
+                </div>
+
+                <div class="insight-section">
+                  <div class="insight-field">
+                    <span class="insight-label">Model Diagnosis</span>
+                    <div class="insight-val-main" id="ins-condition">
+                      <span id="ins-condition-text">HEALTHY</span>
+                    </div>
+                  </div>
+
+                  <div class="insight-box">
+                    <div class="model-tag-row">
+                      <span style="font-weight: 600; color: var(--text-secondary);">Active Model:</span>
+                      <span class="mono-hash">cyaplanex-gb-aeromodel-v1</span>
+                    </div>
+                    <div class="model-tag-row">
+                      <span style="font-weight: 600; color: var(--text-secondary);">Artifact Hash:</span>
+                      <span class="mono-hash" id="ins-model-hash">95ae7ef3...</span>
+                    </div>
+                    <div class="model-tag-row">
+                      <span style="font-weight: 600; color: var(--text-secondary);">Anomaly Confidence:</span>
+                      <span style="font-weight: 700; color: var(--text-primary);" id="ins-confidence">94%</span>
+                    </div>
+                    <div class="model-tag-row">
+                      <span style="font-weight: 600; color: var(--text-secondary);">Classification Severity:</span>
+                      <span style="font-weight: 700;" id="ins-severity">LOW</span>
+                    </div>
+                  </div>
+
+                  <div class="insight-field">
+                    <span class="insight-label">Recommended Maintenance Action</span>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;" id="ins-action">
+                      Component bearing-thrust-01 operates within healthy operating envelope. Continue scheduled flight-line monitoring.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 16px;">
+                <button class="btn btn-secondary btn-pill" id="btn-view-workbench" style="width: 100%;">
+                  Open Maintenance Workbench &rarr;
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- New Feature #1: Maintenance Evidence Timeline -->
+          <section class="timeline-card" aria-label="Evidence Timeline">
+            <div class="card-title-row" style="margin-bottom: 8px;">
+              <div>
+                <h2 class="card-title">Maintenance Evidence Timeline</h2>
+                <p class="card-subtitle">Verifiable Cradle-to-Grave Closed-Loop Diagnostic &amp; Closure Lifecycle</p>
+              </div>
+              <span class="badge-tag" style="background: var(--accent-orange-subtle); color: var(--accent-orange); border: 1px solid var(--accent-orange-border);">
+                END-TO-END VERIFIABLE
+              </span>
+            </div>
+
+            <div class="timeline-track">
+              <!-- Stage 1 -->
+              <div class="timeline-node completed" id="tnode-1" title="Telemetry Captured by physical/replay sensors">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Telemetry Ingest</span>
+                <span class="node-time">09:14:02 UTC</span>
+              </div>
+
+              <!-- Stage 2 -->
+              <div class="timeline-node completed" id="tnode-2" title="Gate B Sensor Trust Engine Adjudication">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Trust Verified</span>
+                <span class="node-time">09:14:03 UTC</span>
+              </div>
+
+              <!-- Stage 3 -->
+              <div class="timeline-node completed" id="tnode-3" title="Production Gradient Boosting ML Inference">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">ML Diagnosis</span>
+                <span class="node-time">09:14:03 UTC</span>
+              </div>
+
+              <!-- Stage 4 -->
+              <div class="timeline-node completed" id="tnode-4" title="Device-local HMAC-SHA256 Manifest Signed">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">HMAC Signed</span>
+                <span class="node-time">09:14:04 UTC</span>
+              </div>
+
+              <!-- Stage 5 -->
+              <div class="timeline-node completed" id="tnode-5" title="MRO Maintenance Priority Dispatched">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Action Dispatched</span>
+                <span class="node-time">09:15:10 UTC</span>
+              </div>
+
+              <!-- Stage 6 -->
+              <div class="timeline-node completed" id="tnode-6" title="Mechanical Assembly Replaced & Torqued">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Repair Executed</span>
+                <span class="node-time">10:20:00 UTC</span>
+              </div>
+
+              <!-- Stage 7 -->
+              <div class="timeline-node completed" id="tnode-7" title="Fresh Sensor Window Acquired">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Fresh Re-Test</span>
+                <span class="node-time">10:45:00 UTC</span>
+              </div>
+
+              <!-- Stage 8 -->
+              <div class="timeline-node completed" id="tnode-8" title="Quantitative Effectiveness Verified (0.92)">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Repair Verified</span>
+                <span class="node-time">10:45:02 UTC</span>
+              </div>
+
+              <!-- Stage 9 -->
+              <div class="timeline-node completed" id="tnode-9" title="Signed Closure Record Added to Passport">
+                <div class="node-icon-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <span class="node-title">Passport Closed</span>
+                <span class="node-time">10:45:03 UTC</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Analytics & Line Trends Row -->
+          <section class="analytics-grid">
+            <!-- Chart 1: Vibration Trend -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3 class="card-title">Vibration Trend (ADXL345 RMS Acceleration)</h3>
+                  <p class="card-subtitle">Real-time spectral harmonic tracking</p>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-line line-orange"></span> Measured RMS</div>
+                  <div class="legend-item"><span class="legend-line line-gray"></span> Threshold (0.80g)</div>
+                </div>
+              </div>
+              <div class="chart-canvas-box">
+                <svg id="svg-chart-vibration" width="100%" height="100%" viewBox="0 0 500 180" preserveAspectRatio="none">
+                  <!-- Grid Lines -->
+                  <line x1="0" y1="45" x2="500" y2="45" stroke="#F1F5F9" stroke-width="1"/>
+                  <line x1="0" y1="90" x2="500" y2="90" stroke="#F1F5F9" stroke-width="1"/>
+                  <line x1="0" y1="135" x2="500" y2="135" stroke="#F1F5F9" stroke-width="1"/>
+                  <!-- Threshold Line (0.80g at y=60) -->
+                  <line x1="0" y1="70" x2="500" y2="70" stroke="#CBD5E1" stroke-dasharray="6 4" stroke-width="1.5"/>
+                  <!-- Vibration Curve -->
+                  <path id="path-chart-vib" d="M 0,135 Q 80,130 160,132 T 320,135 L 360,50 L 400,48 L 440,135 L 500,135" fill="none" stroke="var(--accent-orange)" stroke-width="2.5"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Chart 2: Temperature Equilibrium Trend -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3 class="card-title">Bearing Cap Thermal Equilibrium (MAX6675)</h3>
+                  <p class="card-subtitle">Friction dissipation and steady-state curve</p>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-line" style="background-color: #D97706;"></span> Temp (°C)</div>
+                  <div class="legend-item"><span class="legend-line line-gray"></span> Warning (65.0°C)</div>
+                </div>
+              </div>
+              <div class="chart-canvas-box">
+                <svg id="svg-chart-temp" width="100%" height="100%" viewBox="0 0 500 180" preserveAspectRatio="none">
+                  <!-- Grid Lines -->
+                  <line x1="0" y1="45" x2="500" y2="45" stroke="#F1F5F9" stroke-width="1"/>
+                  <line x1="0" y1="90" x2="500" y2="90" stroke="#F1F5F9" stroke-width="1"/>
+                  <line x1="0" y1="135" x2="500" y2="135" stroke="#F1F5F9" stroke-width="1"/>
+                  <!-- Threshold Line (65C at y=50) -->
+                  <line x1="0" y1="50" x2="500" y2="50" stroke="#CBD5E1" stroke-dasharray="6 4" stroke-width="1.5"/>
+                  <!-- Temperature Curve -->
+                  <path id="path-chart-temp" d="M 0,140 Q 150,110 300,105 T 500,102" fill="none" stroke="#D97706" stroke-width="2.5"/>
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <!-- Lower Row: Tasks & Recent Alerts -->
+          <section class="analytics-grid">
+            <!-- Maintenance Tasks -->
+            <div class="card">
+              <div class="card-title-row">
+                <div>
+                  <h3 class="card-title">Pending Maintenance Work Orders</h3>
+                  <p class="card-subtitle">Automated dispatch based on ML reasoning</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-goto-mro">View All Tasks &rarr;</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>Task Title</th>
+                      <th>Priority</th>
+                      <th>Trigger Event</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbl-mro-tasks">
+                    <tr>
+                      <td style="font-weight: 600;">Inspect Thrust Bearing Assembly</td>
+                      <td><span class="trust-badge-pill degraded" id="tbl-task-prio">P1 - CRITICAL</span></td>
+                      <td class="mono-hash">rep-demo-002</td>
+                      <td><span class="trust-badge-pill" style="background: var(--surface-subtle); color: var(--text-secondary);" id="tbl-task-status">IN PROGRESS</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 600;">MAX6675 Cold-Junction Calibration</td>
+                      <td><span class="trust-badge-pill" style="background: var(--surface-subtle); color: var(--text-secondary);">P3 - ROUTINE</span></td>
+                      <td class="mono-hash">rep-cal-001</td>
+                      <td><span class="trust-badge-pill trusted">VERIFIED</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="card">
+              <div class="card-title-row">
+                <div>
+                  <h3 class="card-title">Recent Aircraft Diagnostic Alerts</h3>
+                  <p class="card-subtitle">Cryptographically verified diagnostic logs</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-open-alerts-evidence">Inspect Audit &rarr;</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Condition</th>
+                      <th>Health</th>
+                      <th>Evidence Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbl-alerts">
+                    <tr style="cursor: pointer;" class="clickable-alert-row" title="Click to view event in Evidence Drawer">
+                      <td class="mono-hash">09:14:03 UTC</td>
+                      <td style="font-weight: 600;" id="tbl-alert-cond">HIGH_VIBRATION</td>
+                      <td style="font-weight: 700;" id="tbl-alert-score" class="text-critical">7.7%</td>
+                      <td><span class="trust-badge-pill trusted" id="tbl-alert-prov">PROVENANCE VERIFIED</span></td>
+                    </tr>
+                    <tr style="cursor: pointer;" class="clickable-alert-row">
+                      <td class="mono-hash">08:00:10 UTC</td>
+                      <td style="font-weight: 600;">HEALTHY</td>
+                      <td style="font-weight: 700; color: var(--status-success);">100.0%</td>
+                      <td><span class="trust-badge-pill trusted">PROVENANCE VERIFIED</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ====================================================================
+             VIEW 2: SENSORS & TRUST PANEL (New Feature #3)
+             ==================================================================== -->
+        <div class="view-panel" id="view-sensors">
+          <div class="card">
+            <div class="card-title-row">
+              <div>
+                <h2 class="card-title">Gate B: Sensor Trust Adjudication Panel</h2>
+                <p class="card-subtitle">Pre-inference signal validation preventing sensor drift false alarms</p>
+              </div>
+              <span class="trust-badge-pill trusted">100% HEALTHY CONSENSUS</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th>Sensor ID &amp; Transducer</th>
+                    <th>Measured Value</th>
+                    <th>Range Check</th>
+                    <th>Freshness Check</th>
+                    <th>Stuck Check</th>
+                    <th>Consensus Score</th>
+                    <th>Trust Decision</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">vib-phys-01</div>
+                      <div class="sensor-meta">ADXL345 3-Axis Accelerometer (&plusmn;16g)</div>
+                    </td>
+                    <td class="mono-hash" id="st-vib-val">0.35 g</td>
+                    <td><span class="trust-badge-pill trusted">0.05 &le; x &le; 16.0g</span></td>
+                    <td><span class="trust-badge-pill trusted">&Delta;t = 0.05s</span></td>
+                    <td><span class="trust-badge-pill trusted">StdDev = 0.04g</span></td>
+                    <td class="mono-hash">1.00</td>
+                    <td><span class="trust-badge-pill trusted" id="st-vib-trust">TRUSTED</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">temp-phys-01</div>
+                      <div class="sensor-meta">MAX6675 Cold-Junction Thermocouple</div>
+                    </td>
+                    <td class="mono-hash" id="st-temp-val">48.5 °C</td>
+                    <td><span class="trust-badge-pill trusted">0°C &le; x &le; 1024°C</span></td>
+                    <td><span class="trust-badge-pill trusted">&Delta;t = 0.10s</span></td>
+                    <td><span class="trust-badge-pill trusted">StdDev = 0.20°C</span></td>
+                    <td class="mono-hash">1.00</td>
+                    <td><span class="trust-badge-pill trusted">TRUSTED</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">rpm-phys-01</div>
+                      <div class="sensor-meta">A3144 Hall-Effect Digital Switch</div>
+                    </td>
+                    <td class="mono-hash" id="st-rpm-val">1,750 rpm</td>
+                    <td><span class="trust-badge-pill trusted">0 &le; x &le; 6000 rpm</span></td>
+                    <td><span class="trust-badge-pill trusted">&Delta;t = 0.02s</span></td>
+                    <td><span class="trust-badge-pill trusted">StdDev = 8.5 rpm</span></td>
+                    <td class="mono-hash">1.00</td>
+                    <td><span class="trust-badge-pill trusted">TRUSTED</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================
+             VIEW 3: MAINTENANCE WORKBENCH (New Feature #4)
+             ==================================================================== -->
+        <div class="view-panel" id="view-maintenance">
+          <div class="card">
+            <div class="card-title-row">
+              <div>
+                <h2 class="card-title">MRO Closed-Loop Maintenance Workbench</h2>
+                <p class="card-subtitle">End-to-end task progression from diagnostic anomaly to verified repair closure</p>
+              </div>
+              <span class="trust-badge-pill" style="background: var(--surface-subtle); color: var(--text-primary); border: 1px solid var(--border-subtle);" id="wb-status-tag">
+                STAGE: REPAIR VERIFIED
+              </span>
+            </div>
+
+            <!-- Task Stages Breadcrumb -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 14px 20px; background: var(--surface-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">1. DETECTED &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">2. TRIAGED &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">3. SCHEDULED &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--accent-orange);" id="stage-in-prog">4. IN PROGRESS &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--accent-orange);" id="stage-retest">5. RE-TEST &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--status-success);" id="stage-verified">6. VERIFIED &check;</span>
+              <span>&rarr;</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--status-success);" id="stage-closed">7. CLOSED &check;</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+              <div>
+                <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Active Work Order: WO-AERO-2026-002</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                  Triggered by report <span class="mono-hash">rep-demo-002</span>. High vibration (1.85g) detected on thrust bearing assembly with CRITICAL severity.
+                </p>
+
+                <div class="evidence-section-card" style="margin-bottom: 16px;">
+                  <div class="evidence-section-title">Maintenance Action Taken</div>
+                  <p style="font-size: 12.5px; color: var(--text-primary); line-height: 1.6;">
+                    Removed pillow-block assembly; inspected outer raceway for spalling. Replaced bearing with certified SKF Explorer 6205 assembly; torqued mounting hardware to 45 Nm per AMM Chapter 72-00-02.
+                  </p>
+                </div>
+
+                <div class="evidence-section-card">
+                  <div class="evidence-section-title">Fresh Post-Repair Telemetry</div>
+                  <p style="font-size: 12.5px; color: var(--text-primary); line-height: 1.6;">
+                    Fresh sensor window acquired across 100 consecutive cycles at 1,750 RPM. Post-maintenance vibration RMS: <strong>0.35g</strong>. Pre-maintenance: <strong>1.85g</strong>. Repair Effectiveness: <strong style="color: var(--status-success);">0.92 (REPAIR_VERIFIED)</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 12px; background: var(--surface-subtle); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <span class="callout-label">Work Order Actions</span>
+                <button class="btn btn-secondary" id="wb-btn-start">Mark Maintenance Started</button>
+                <button class="btn btn-primary" id="wb-btn-retest">Acquire Fresh Re-Test Window</button>
+                <button class="btn btn-secondary" id="wb-btn-close">Close Order &amp; Append Passport</button>
+                <button class="btn btn-secondary" id="wb-btn-evidence">View Evidence Drawer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================
+             VIEW 4: PROVENANCE & CRYPTOGRAPHY
+             ==================================================================== -->
+        <div class="view-panel" id="view-provenance">
+          <div class="card">
+            <div class="card-title-row">
+              <div>
+                <h2 class="card-title">Cryptographic Provenance &amp; Tamper Defense</h2>
+                <p class="card-subtitle">Device-local HMAC-SHA256 signing and independent cloud verification</p>
+              </div>
+              <span class="trust-badge-pill trusted" id="prov-status-tag">PROVENANCE VERIFIED</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+              <!-- Left Card: Hashes -->
+              <div class="evidence-section-card">
+                <div class="evidence-section-title">Immutable Manifest Hashes</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div>
+                    <span class="sensor-meta">Raw Sensor Window SHA-256:</span>
+                    <div class="hash-copy-row">
+                      <span id="txt-prov-winhash">73d4f37a6d157fe05e9ba5642fcf5dca658920192e44810938...</span>
+                      <button class="btn-copy" data-target="txt-prov-winhash" title="Copy Hash">Copy</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span class="sensor-meta">Canonical Manifest SHA-256:</span>
+                    <div class="hash-copy-row">
+                      <span id="txt-prov-manhash">32e201316aaf821391f93ecd9b9452cb90145892019485...</span>
+                      <button class="btn-copy" data-target="txt-prov-manhash" title="Copy Hash">Copy</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span class="sensor-meta">Active ML Artifact SHA-256 (Joblib):</span>
+                    <div class="hash-copy-row">
+                      <span id="txt-prov-modhash">95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b</span>
+                      <button class="btn-copy" data-target="txt-prov-modhash" title="Copy Hash">Copy</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span class="sensor-meta">Device-Local HMAC-SHA256 Signature:</span>
+                    <div class="hash-copy-row">
+                      <span id="txt-prov-signature">hmac-sha256:65332fe2cbde4f69093d3092...</span>
+                      <button class="btn-copy" data-target="txt-prov-signature" title="Copy Signature">Copy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Card: Tamper Attack Testbed -->
+              <div class="evidence-section-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="evidence-section-title">Cryptographic Tamper Defense Demonstration</div>
+                  <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
+                    Simulate an adversarial attack where a technician or malicious actor tampers with the health score (e.g. altering <strong>7.7%</strong> to <strong>99.0%</strong> in transit to falsely clear the engine for flight).
+                  </p>
+                  <div style="background: #FFFFFF; border: 1px solid var(--border-subtle); padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 14px;">
+                    <div style="color: var(--text-muted); margin-bottom: 4px;">Tamper Attack Test Status:</div>
+                    <div style="font-weight: 700; color: var(--text-primary);" id="txt-tamper-result">
+                      Unmodified Baseline: Signature matches computed manifest hash.
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn btn-danger" id="btn-prov-tamper">Inject Tampered Payload (99.0%)</button>
+                  <button class="btn btn-secondary" id="btn-prov-restore">Reset to Verified Payload</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================
+             VIEW 5: COMPONENT DIGITAL PASSPORT (New Feature #5)
+             ==================================================================== -->
+        <div class="view-panel" id="view-passport">
+          <div class="card">
+            <div class="card-title-row">
+              <div>
+                <h2 class="card-title">Component Digital Passport Ledger</h2>
+                <p class="card-subtitle">Permanent, append-only service ledger tracking cradle-to-grave aircraft component health</p>
+              </div>
+              <span class="trust-badge-pill trusted">2 VERIFIED LIFECYCLE EVENTS</span>
+            </div>
+
+            <!-- Passport Identity Summary -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; padding: 18px; background: var(--surface-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <div>
+                <span class="sensor-meta">Component Name</span>
+                <div style="font-weight: 700; font-size: 14px;">bearing-thrust-01</div>
+              </div>
+              <div>
+                <span class="sensor-meta">Part Specification</span>
+                <div style="font-weight: 700; font-size: 14px;">SKF Explorer 6205</div>
+              </div>
+              <div>
+                <span class="sensor-meta">Total Flight Hours</span>
+                <div style="font-weight: 700; font-size: 14px;">1,420 Hours</div>
+              </div>
+              <div>
+                <span class="sensor-meta">Passport Ledger Status</span>
+                <div style="font-weight: 700; font-size: 14px; color: var(--status-success);">CRYPTOGRAPHICALLY SEALED</div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>Record Type</th>
+                    <th>Reference ID</th>
+                    <th>Condition / Action</th>
+                    <th>Health Evidence</th>
+                    <th>Manifest Hash</th>
+                    <th>Verification</th>
+                    <th>Evidence</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-passport-full">
+                  <tr>
+                    <td class="mono-hash">2026-10-02 09:14:03</td>
+                    <td><span class="trust-badge-pill degraded">DIAGNOSTIC_EVENT</span></td>
+                    <td class="mono-hash">rep-demo-002</td>
+                    <td style="font-weight: 600;">HIGH_VIBRATION</td>
+                    <td class="text-critical" style="font-weight: 700;">Health: 7.7% (CRITICAL)</td>
+                    <td class="mono-hash">32e201...52cb</td>
+                    <td><span class="trust-badge-pill trusted">PROVENANCE VERIFIED</span></td>
+                    <td><button class="btn btn-secondary btn-sm btn-drawer-event" data-rep="rep-demo-002">View &rarr;</button></td>
+                  </tr>
+                  <tr>
+                    <td class="mono-hash">2026-10-02 10:45:00</td>
+                    <td><span class="trust-badge-pill trusted">MAINTENANCE_CLOSURE</span></td>
+                    <td class="mono-hash">clo-1fc447c2</td>
+                    <td style="font-weight: 600;">Replaced bearing &amp; torqued</td>
+                    <td style="font-weight: 700; color: var(--status-success);">Pre: 7.7% &rarr; Post: 100.0% (Eff: 0.92)</td>
+                    <td class="mono-hash">8a1e2f...b3c9</td>
+                    <td><span class="trust-badge-pill trusted">REPAIR_VERIFIED</span></td>
+                    <td><button class="btn btn-secondary btn-sm btn-drawer-event" data-rep="clo-1fc447c2">View &rarr;</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </main>
     </div>
+
+    <!-- ====================================================================
+         NEW FEATURE #2: SLIDING EVIDENCE DRAWER
+         ==================================================================== -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <aside class="evidence-drawer" id="evidence-drawer" aria-label="Event Evidence Drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h3>Cryptographic Event Evidence</h3>
+          <p id="drawer-subtitle">Report: rep-demo-002 • Verified Event</p>
+        </div>
+        <button class="drawer-close-btn" id="btn-close-drawer" title="Close Drawer">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Section 1: Event Summary -->
+        <div class="evidence-section-card">
+          <div class="evidence-section-title">
+            <span>Event Summary</span>
+            <span class="trust-badge-pill trusted" id="drw-badge-prov">VERIFIED</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+            <div><span class="sensor-meta">Event ID:</span> <div class="mono-hash" id="drw-event-id">rep-demo-002</div></div>
+            <div><span class="sensor-meta">Asset Target:</span> <div class="mono-hash">aircraft-wing-lh</div></div>
+            <div><span class="sensor-meta">Timestamp:</span> <div class="mono-hash" id="drw-time">2026-10-02T09:14:03Z</div></div>
+            <div><span class="sensor-meta">Sequence / Nonce:</span> <div class="mono-hash" id="drw-seq">Seq: 1 | n-550e84</div></div>
+          </div>
+        </div>
+
+        <!-- Section 2: Sensor Snapshot -->
+        <div class="evidence-section-card">
+          <div class="evidence-section-title">Sensor Snapshot (Frozen 6-Feature Tuple)</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+            <div><span class="sensor-meta">vib_rms:</span> <div style="font-weight: 700;" id="drw-vib-rms">1.85 g</div></div>
+            <div><span class="sensor-meta">vib_p2p:</span> <div style="font-weight: 700;" id="drw-vib-p2p">2.92 g</div></div>
+            <div><span class="sensor-meta">temp_mean:</span> <div style="font-weight: 700;" id="drw-temp-mean">54.2 °C</div></div>
+            <div><span class="sensor-meta">temp_max:</span> <div style="font-weight: 700;" id="drw-temp-max">58.0 °C</div></div>
+            <div><span class="sensor-meta">rpm_mean:</span> <div style="font-weight: 700;" id="drw-rpm-mean">3,600 rpm</div></div>
+            <div><span class="sensor-meta">rpm_std:</span> <div style="font-weight: 700;" id="drw-rpm-std">14.2 rpm</div></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Machine Learning Output -->
+        <div class="evidence-section-card">
+          <div class="evidence-section-title">Machine Learning Diagnosis</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 8px;">
+            <div><span class="sensor-meta">Diagnosed Condition:</span> <div style="font-weight: 700; color: var(--status-critical);" id="drw-cond">HIGH_VIBRATION</div></div>
+            <div><span class="sensor-meta">Health Score:</span> <div style="font-weight: 700;" id="drw-health">7.7%</div></div>
+            <div><span class="sensor-meta">Severity:</span> <div style="font-weight: 700;" id="drw-sev">CRITICAL</div></div>
+            <div><span class="sensor-meta">Anomaly Score:</span> <div style="font-weight: 700;" id="drw-anomaly">0.94</div></div>
+          </div>
+        </div>
+
+        <!-- Section 4: Model Identity & Cryptographic Hashes -->
+        <div class="evidence-section-card">
+          <div class="evidence-section-title">Model Identity &amp; Provenance Binding</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+            <div>
+              <span class="sensor-meta">Model ID &amp; Version:</span>
+              <div style="font-weight: 600;">cyaplanex-gb-aeromodel-v1 (v1.0.0)</div>
+            </div>
+            <div>
+              <span class="sensor-meta">Model Artifact SHA-256:</span>
+              <div class="hash-copy-row">
+                <span id="drw-modhash">95ae7ef37e1fd3f32de96f33f60c2971...</span>
+                <button class="btn-copy" data-target="drw-modhash">Copy</button>
+              </div>
+            </div>
+            <div>
+              <span class="sensor-meta">Sensor Window SHA-256:</span>
+              <div class="hash-copy-row">
+                <span id="drw-winhash">73d4f37a6d157fe05e9ba5642fcf5dca...</span>
+                <button class="btn-copy" data-target="drw-winhash">Copy</button>
+              </div>
+            </div>
+            <div>
+              <span class="sensor-meta">HMAC-SHA256 Signature:</span>
+              <div class="hash-copy-row">
+                <span id="drw-sig">hmac-sha256:65332fe2cbde4f69093d3092...</span>
+                <button class="btn-copy" data-target="drw-sig">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Closed-Loop Post-Repair Verification -->
+        <div class="evidence-section-card">
+          <div class="evidence-section-title">Closed-Loop Repair Verification</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+            <div><span class="sensor-meta">Mechanical Action:</span> <div style="font-weight: 600;">Replaced thrust bearing; torqued mountings to 45 Nm</div></div>
+            <div><span class="sensor-meta">Post-Repair Health Score:</span> <div style="font-weight: 700; color: var(--status-success);">100.0% (Pre-repair: 7.7%)</div></div>
+            <div><span class="sensor-meta">Repair Effectiveness:</span> <div style="font-weight: 700; color: var(--status-success);">0.92 (Threshold: &ge; 0.80) &rarr; REPAIR_VERIFIED</div></div>
+            <div><span class="sensor-meta">Closure Record ID:</span> <div class="mono-hash">clo-1fc447c2 (Added to Component Passport)</div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
   </div>
 
   <script src="app.js"></script>
