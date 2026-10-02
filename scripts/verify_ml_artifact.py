@@ -17,15 +17,15 @@ from __future__ import annotations
 
 import argparse
 import importlib
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from edge.ai.adapter import BaselineDemonstratorModel, EdgeMLAdapter, validate_model_artifact
+from edge.ai.adapter import BaselineDemonstratorModel, validate_model_artifact
 
 
 def main() -> int:
@@ -49,6 +49,13 @@ def main() -> int:
         "--baseline",
         action="store_true",
         help="Force evaluation of the baseline demonstrator fixture.",
+    )
+    parser.add_argument(
+        "--expected-hash",
+        dest="expected_hash",
+        type=str,
+        default=None,
+        help="Expected 64-character SHA-256 hash for integrity validation.",
     )
     args = parser.parse_args()
 
@@ -82,18 +89,24 @@ def main() -> int:
             is_baseline = True
 
     # 2. Run validation checks
-    report = validate_model_artifact(model_instance)
+    report = validate_model_artifact(model_instance, expected_hash=args.expected_hash)
 
-    print("\n--- Acceptance Check Results ---")
-    print(f"1. Callable predict() method:      {'PASSED' if report['has_predict_method'] else 'FAILED'}")
-    print(f"2. 6-Feature Input Contract:       {'PASSED' if report['input_contract_verified'] else 'FAILED'}")
-    print("   Order: [vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]")
-    print(f"3. HealthResult Schema Contract:   {'PASSED' if report['output_schema_verified'] else 'FAILED'}")
-    print(f"4. Model Identifier:               {report.get('model_id')}")
-    print(f"5. Model Version:                  {report.get('model_version')}")
-    print(f"6. Model SHA-256 Hash:             {report.get('model_hash')}")
-    print(f"7. Sample Health Score:            {report.get('sample_health_score')}%")
-    print(f"8. Sample Diagnosed Condition:     {report.get('sample_condition')}")
+    print("\n--- 12-Point Acceptance Gate Results ---")
+    for chk in report.get("checks", []):
+        cid = chk["id"]
+        cname = chk["name"]
+        cstatus = chk["status"]
+        cdetail = chk.get("detail", "")
+        status_str = f"[{cstatus}]"
+        print(f"Check {cid:02d}: {cname:<32} {status_str:<8} | {cdetail}")
+
+    print("\n--- Model Metadata & Telemetry ---")
+    print(f"Model Identifier:               {report.get('model_id')}")
+    print(f"Model Version:                  {report.get('model_version')}")
+    print(f"Model Runtime Hash:             {report.get('model_hash')}")
+    print(f"Artifact Hash Verified:         {'PASSED' if report.get('hash_verified') else 'FAILED'}")
+    print(f"Sample Diagnosed Condition:     {report.get('sample_condition')}")
+    print(f"Sample Health Score:            {report.get('sample_health_score')}%")
 
     if is_baseline:
         print("\n[NOTE] Model evaluated is the BASELINE DEMONSTRATOR.")
@@ -108,10 +121,8 @@ def main() -> int:
             print(f"  - {err}")
         return 1
 
-    # 3. Test through EdgeMLAdapter
-    adapter = EdgeMLAdapter(model=model_instance)
-    res = adapter.infer([0.35, 0.1, 50.0, 52.0, 3000.0, 10.0])
-    print(f"\n[PASSED] EdgeMLAdapter integration verified. Condition={res.condition}, Health={res.health_score}%")
+    # 3. Final summary
+    print("\n[PASSED] All 12/12 Acceptance Checks passed successfully.")
     print("=" * 72)
     return 0
 

@@ -49,7 +49,7 @@ All 15 application subsystems under Kavindra E.M.'s ownership have been implemen
 
 - **Current State:** Monhit Raju has **COMPLETED & DELIVERED** the production ML models.
 - **Model in Use:** `CyaplaneXProductionModel` (`cyaplanex-gb-aeromodel-v1`) and `CyaplaneXONNXModel` (`cyaplanex-onnx-aeromodel-v1`), trained on Case Western Reserve University (CWRU) physical bearing dataset. Achieves 99.96% overall accuracy, 0.9996 macro F1, and 0.025% False Positive Rate.
-- **Frozen ML Integration Contract:** Implemented and verified in [`docs/ML_INTEGRATION_CONTRACT.md`](file:///c:/Users/monhi/OneDrive/Desktop/project/CyaplaneX/docs/ML_INTEGRATION_CONTRACT.md):
+- **Frozen ML Integration Contract:** Implemented and verified in [`docs/ML_INTEGRATION_CONTRACT.md`](file:///d:/CyplaneX/docs/ML_INTEGRATION_CONTRACT.md):
   - **Feature Vector (6 Features, Strict Order):** `[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]`
   - **Return Schema:** JSON Schema Draft 2020-12 conforming `HealthResult` dictionary (`health_score`, `anomaly_score`, `confidence`, `condition`, `severity`, `model_id`, `model_version`, `model_hash`).
   - **Packaging Supported:** Python class conforming to `InferenceModel` protocol, Joblib serialized ensemble (`cyaplanex_production_model.joblib`), and ONNX model artifact (`cyaplanex_model.onnx`).

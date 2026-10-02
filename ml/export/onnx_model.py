@@ -34,12 +34,19 @@ class CyaplaneXONNXModel:
     MODEL_ID: ClassVar[str] = "cyaplanex-onnx-aeromodel-v1"
     MODEL_VERSION: ClassVar[str] = "1.0.0"
 
-    def __init__(self, onnx_path: Path | str | None = None) -> None:
-        self.onnx_path = Path(onnx_path) if onnx_path else (
+    def __init__(
+        self,
+        onnx_path: Path | str | None = None,
+        model_path: Path | str | None = None,
+    ) -> None:
+        chosen_path = model_path or onnx_path
+        self.onnx_path = Path(chosen_path) if chosen_path else (
             Path(__file__).resolve().parent.parent / "models" / "cyaplanex_model.onnx"
         )
-        self.session: Any = None
-        self.model_hash = "0" * 64
+        if not self.onnx_path.exists():
+            raise FileNotFoundError(f"ONNX model artifact not found: {self.onnx_path}")
+
+        self.model_hash = hashlib.sha256(self.onnx_path.read_bytes()).hexdigest()
         self.classes: list[str] = [
             "HEALTHY",
             "HIGH_VIBRATION",
@@ -48,24 +55,24 @@ class CyaplaneXONNXModel:
             "SPEED_INSTABILITY",
         ]
 
-        if self.onnx_path.exists():
-            self.model_hash = hashlib.sha256(self.onnx_path.read_bytes()).hexdigest()
-            meta_path = self.onnx_path.parent / "onnx_metadata.json"
-            if meta_path.exists():
-                try:
-                    meta = json.loads(meta_path.read_text())
-                    self.classes = meta.get("classes", self.classes)
-                except (json.JSONDecodeError, OSError):
-                    pass
+        meta_path = self.onnx_path.parent / "onnx_metadata.json"
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text())
+                self.classes = meta.get("classes", self.classes)
+            except (json.JSONDecodeError, OSError):
+                pass
 
-            if ort is not None:
-                try:
-                    self.session = ort.InferenceSession(
-                        str(self.onnx_path),
-                        providers=["CPUExecutionProvider"],
-                    )
-                except (OSError, RuntimeError, ValueError):
-                    self.session = None
+        if ort is None:
+            raise RuntimeError("onnxruntime dependency is not installed; cannot load CyaplaneXONNXModel")
+
+        try:
+            self.session = ort.InferenceSession(
+                str(self.onnx_path),
+                providers=["CPUExecutionProvider"],
+            )
+        except Exception as err:
+            raise RuntimeError(f"Failed to create ONNX InferenceSession for {self.onnx_path}: {err}") from err
 
     def predict(self, features: Sequence[float]) -> dict[str, Any]:
         """Execute inference against the frozen 6-feature contract vector using ONNX."""
@@ -75,23 +82,24 @@ class CyaplaneXONNXModel:
                 f"{list(FROZEN_FEATURE_NAMES)}, received {len(features)}"
             )
 
+        if self.session is None:
+            raise RuntimeError("ONNX InferenceSession is not loaded; cannot perform inference")
+
         vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std = [float(v) for v in features[:6]]
 
-        if self.session is not None:
-            input_name = self.session.get_inputs()[0].name
-            input_arr = np.array([[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]], dtype=np.float32)
-            outputs = self.session.run(None, {input_name: input_arr})
-            probs = outputs[0][0]
-            pred_idx = int(np.argmax(probs))
-            pred_class = self.classes[pred_idx]
-            confidence = round(float(probs[pred_idx]), 4)
-            healthy_idx = self.classes.index("HEALTHY") if "HEALTHY" in self.classes else -1
-            model_anomaly = 1.0 - (float(probs[healthy_idx]) if healthy_idx >= 0 else 0.0)
-        else:
-            # Fallback
-            pred_class = "HEALTHY"
-            confidence = 0.95
-            model_anomaly = 0.05
+        for val in (vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std):
+            if np.isnan(val) or np.isinf(val):
+                raise ValueError("Feature vector contains NaN or Inf values")
+
+        input_name = self.session.get_inputs()[0].name
+        input_arr = np.array([[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]], dtype=np.float32)
+        outputs = self.session.run(None, {input_name: input_arr})
+        probs = outputs[0][0]
+        pred_idx = int(np.argmax(probs))
+        pred_class = self.classes[pred_idx]
+        confidence = round(float(probs[pred_idx]), 4)
+        healthy_idx = self.classes.index("HEALTHY") if "HEALTHY" in self.classes else -1
+        model_anomaly = 1.0 - (float(probs[healthy_idx]) if healthy_idx >= 0 else 0.0)
 
         # Physics-guided diagnostic guards (ISO 10816 & Aerospace Machinery Hazard Zones)
         if vib_rms > 1.40:

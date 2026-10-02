@@ -46,7 +46,7 @@ class EdgePipelineOrchestrator:
             try:
                 from ml.export.model import ProductionModel
                 resolved_model = ProductionModel()
-            except (ImportError, OSError, ValueError):
+            except (ImportError, OSError, ValueError, RuntimeError):
                 resolved_model = None
         else:
             resolved_model = model

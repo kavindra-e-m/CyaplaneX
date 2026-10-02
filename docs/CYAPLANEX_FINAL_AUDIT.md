@@ -73,8 +73,8 @@ To ensure clean technical boundaries, the codebase is partitioned into completed
 12. **Verification & Maintenance REST API:** `cloud/api/app.py`
 13. **MRO Web Dashboard:** `dashboard/web/public/` (10 operational states, 8 interactive button flows)
 14. **Maintenance Closed Loop:** Diagnosis &rarr; Maintenance Started &rarr; Fresh Re-test &rarr; Repair Effectiveness &rarr; Signed ClosureRecord &rarr; Digital Passport
-15. **Automated Test Suite:** 58 automated tests in pytest (100% passing)
-16. **Production ML Subsystem:** `ml/**` (CWRU bearing data curation, dual Joblib/ONNX runtimes, spectral FFT harmonics, 99.8% test accuracy, 10/10 ML unit tests)
+15. **Automated Test Suite:** 68 automated tests in pytest (100% passing)
+16. **Production ML Subsystem:** `ml/**` (CWRU bearing data curation, dual Joblib/ONNX runtimes, spectral FFT harmonics, 99.8% test accuracy, 20/20 ML unit tests)
 
 #### PENDING (External Dependencies & Physical Validation)
 1. **Physical Hardware-in-the-Loop (HIL):** ESP32 microcontroller acquisition, physical accelerometer, thermocouple, and rotating shaft test bench remain pending physical lab wiring and calibration.

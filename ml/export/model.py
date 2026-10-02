@@ -39,20 +39,27 @@ class CyaplaneXProductionModel:
     MODEL_VERSION: ClassVar[str] = "1.0.0"
     DEFAULT_HASH: ClassVar[str] = "95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b"
 
-    def __init__(self, artifact_path: Path | str | None = None) -> None:
-        self.artifact_path = Path(artifact_path) if artifact_path else (
+    def __init__(
+        self,
+        artifact_path: Path | str | None = None,
+        model_path: Path | str | None = None,
+    ) -> None:
+        chosen_path = model_path or artifact_path
+        self.artifact_path = Path(chosen_path) if chosen_path else (
             Path(__file__).resolve().parent.parent / "models" / "cyaplanex_production_model.joblib"
         )
-        self.model: Any = None
-        self.model_hash = self.DEFAULT_HASH
+        if not self.artifact_path.exists():
+            raise FileNotFoundError(f"Production model artifact not found: {self.artifact_path}")
+        if joblib is None:
+            raise RuntimeError("joblib dependency is not installed; cannot load CyaplaneXProductionModel")
 
-        if self.artifact_path.exists() and joblib is not None:
-            try:
-                self.model = joblib.load(self.artifact_path)
-                import hashlib
-                self.model_hash = hashlib.sha256(self.artifact_path.read_bytes()).hexdigest()
-            except (OSError, ValueError, TypeError, KeyError):
-                self.model = None
+        try:
+            self.model = joblib.load(self.artifact_path)
+        except Exception as err:
+            raise RuntimeError(f"Failed to load production model artifact from {self.artifact_path}: {err}") from err
+
+        import hashlib
+        self.model_hash = hashlib.sha256(self.artifact_path.read_bytes()).hexdigest()
 
     def predict(self, features: Sequence[float]) -> dict[str, Any]:
         """Execute inference against the frozen 6-feature contract vector.
@@ -66,42 +73,26 @@ class CyaplaneXProductionModel:
                 f"{list(FROZEN_FEATURE_NAMES)}, received {len(features)}"
             )
 
+        if self.model is None:
+            raise RuntimeError("Production model is not loaded; cannot perform inference")
+
         vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std = [float(v) for v in features[:6]]
 
-        # 1. Ensemble model prediction if available
-        if self.model is not None:
-            feat_arr = np.array([[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]], dtype=np.float64)
-            pred_class = str(self.model.predict(feat_arr)[0])
-            probs = self.model.predict_proba(feat_arr)[0]
-            class_idx = list(self.model.classes_).index(pred_class)
-            confidence = round(float(probs[class_idx]), 4)
-            
-            # Anomaly distance: 1.0 - P(HEALTHY)
-            healthy_idx = list(self.model.classes_).index("HEALTHY") if "HEALTHY" in self.model.classes_ else -1
-            healthy_prob = float(probs[healthy_idx]) if healthy_idx >= 0 else 0.0
-            model_anomaly = 1.0 - healthy_prob
-        else:
-            # Deterministic fallback classifier calibrated to model boundaries
-            if vib_rms > 1.40 or vib_p2p > 0.60:
-                pred_class = "HIGH_VIBRATION"
-                confidence = 0.99
-                model_anomaly = 0.95
-            elif temp_max > 85.0:
-                pred_class = "OVERHEATING"
-                confidence = 0.98
-                model_anomaly = 0.92
-            elif rpm_std > 38.0:
-                pred_class = "SPEED_INSTABILITY"
-                confidence = 0.96
-                model_anomaly = 0.75
-            elif vib_rms > 0.45 or (temp_mean > 58.0 and vib_rms > 0.40):
-                pred_class = "MECHANICAL_WEAR"
-                confidence = 0.94
-                model_anomaly = 0.55
-            else:
-                pred_class = "HEALTHY"
-                confidence = 0.98
-                model_anomaly = 0.05
+        for val in (vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std):
+            if np.isnan(val) or np.isinf(val):
+                raise ValueError("Feature vector contains NaN or Inf values")
+
+        # 1. Ensemble model prediction
+        feat_arr = np.array([[vib_rms, vib_p2p, temp_mean, temp_max, rpm_mean, rpm_std]], dtype=np.float64)
+        pred_class = str(self.model.predict(feat_arr)[0])
+        probs = self.model.predict_proba(feat_arr)[0]
+        class_idx = list(self.model.classes_).index(pred_class)
+        confidence = round(float(probs[class_idx]), 4)
+
+        # Anomaly distance: 1.0 - P(HEALTHY)
+        healthy_idx = list(self.model.classes_).index("HEALTHY") if "HEALTHY" in self.model.classes_ else -1
+        healthy_prob = float(probs[healthy_idx]) if healthy_idx >= 0 else 0.0
+        model_anomaly = 1.0 - healthy_prob
 
         # Physics-guided diagnostic guards (ISO 10816 & Aerospace Machinery Hazard Zones)
         if vib_rms > 1.40:

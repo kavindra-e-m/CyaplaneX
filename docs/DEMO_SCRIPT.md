@@ -15,7 +15,7 @@ From the repository root (`CyplaneX/`), run:
 # 1. Run the complete 20-step end-to-end closed-loop demonstration
 python scripts/e2e_demo.py
 
-# 2. Run the unit and integration test suite (47 automated tests)
+# 2. Run the unit and integration test suite (68 automated tests)
 pytest -v
 
 # 3. Run individual security and contract test scripts

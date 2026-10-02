@@ -27,7 +27,7 @@
 - **Verification & Maintenance REST API:** `cloud/api/app.py`, `health.py`, `verification.py`, `passport.py`, `maintenance.py`
 - **MRO Web Dashboard:** `dashboard/web/public/index.html`, `styles.css`, `app.js` (10 states, 8 interactive button workflows)
 - **Maintenance Closed Loop:** Diagnosis &rarr; Maintenance Started &rarr; Fresh Re-test &rarr; Repair Effectiveness &rarr; Signed ClosureRecord &rarr; Digital Passport
-- **Automated Test Suite:** 58 automated tests passing (100%)
+- **Automated Test Suite:** 68 automated tests passing (100%)
 - **Monhit Raju Production ML Artifacts:** Dual models (`cyaplanex_production_model.joblib` and `cyaplanex_model.onnx`) trained on CWRU bearing dataset with 99.96% accuracy, verified through acceptance gate.
 
 #### PENDING (Engineering Boundaries & External Dependencies)

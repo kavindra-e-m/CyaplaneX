@@ -19,7 +19,7 @@ Predictive maintenance systems in rotating machinery (e.g. aircraft gas turbine 
 $$\text{Sense} \longrightarrow \text{Validate} \longrightarrow \text{Fuse} \longrightarrow \text{Predict} \longrightarrow \text{Explain} \longrightarrow \text{Sign} \longrightarrow \text{Sync} \longrightarrow \text{Verify} \longrightarrow \text{Maintain} \longrightarrow \text{Re-test} \longrightarrow \text{Close}$$
 
 ### Project Status Statement
-> **"CyaplaneX local end-to-end software demonstrator completed and verified; ML production model artifacts trained on real CWRU bearing benchmarks and verified across 58 automated tests; physical HIL validation and live AWS deployment remain target architecture milestones."**
+> **"CyaplaneX local end-to-end software demonstrator completed and verified; ML production model artifacts trained on real CWRU bearing benchmarks and verified across 68 automated tests; physical HIL validation and live AWS deployment remain target architecture milestones."**
 
 ---
 
@@ -43,7 +43,7 @@ $$\text{Sense} \longrightarrow \text{Validate} \longrightarrow \text{Fuse} \long
 - **REST API Server (`cloud/api/app.py`):** Framework-neutral WSGI service exposing `/health`, `/verification/events`, `/maintenance/*`, and `/passport/*`.
 - **MRO Web Dashboard (`dashboard/web/public/`):** Dark-mode operator interface with real-time gauges, 10 operational states, interactive repair flows, and simulated tamper injection testing.
 - **Closed-Loop Maintenance Remediation:** Tracks maintenance in progress, fresh post-repair re-test, repair effectiveness calculation, and commits tamper-evident `ClosureRecord` into the Digital Passport.
-- **Automated Test Suite:** **58 / 58 automated tests passing (100%)** across unit, security, integration, and e2e suites.
+- **Automated Test Suite:** **68 / 68 automated tests passing (100%)** across unit, security, integration, and e2e suites.
 
 ### PENDING (External Dependencies & Physical Hardware)
 - **Physical HIL:** Microcontroller (ESP32) acquisition over serial stream reader, physical accelerometer, thermocouple, and rotating shaft test rig.

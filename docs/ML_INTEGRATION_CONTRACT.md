@@ -10,7 +10,7 @@
 
 ## 1. Current State & Ownership Boundaries
 
-> **HANDOFF STATUS:** Monhit Raju's production ML model artifacts (`CyaplaneXProductionModel` and `CyaplaneXONNXModel`) have been trained on the real CWRU bearing dataset, validated against the 12-point acceptance gate via `scripts/verify_ml_artifact.py`, and verified with 58 automated unit/integration tests.
+> **HANDOFF STATUS:** Monhit Raju's production ML model artifacts (`CyaplaneXProductionModel` and `CyaplaneXONNXModel`) have been trained on the real CWRU bearing dataset, validated against the 12-point acceptance gate via `scripts/verify_ml_artifact.py`, and verified with 68 automated unit/integration tests.
 
 - **Monhit Raju Owns (`ml/**`):**
   - Dataset ingestion and exploratory data analysis.
