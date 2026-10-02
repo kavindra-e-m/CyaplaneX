@@ -32,6 +32,8 @@ def wsgi_app(environ: dict[str, Any], start_response: Callable) -> list[bytes]:
             "/index.html": ("index.html", "text/html; charset=utf-8"),
             "/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/app.js": ("app.js", "application/javascript; charset=utf-8"),
+            "/favicon.ico": ("favicon.ico", "image/x-icon"),
+            "/favicon.svg": ("favicon.svg", "image/svg+xml"),
         }
         if path in file_map:
             filename, ctype = file_map[path]
