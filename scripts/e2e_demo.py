@@ -1,10 +1,4 @@
-"""CyaplaneX — Complete Tata Technologies InnoVent 2026 End-to-End Demonstrator.
-
-Executes the continuous 20-step lifecycle:
-Sense -> Validate Trust -> Predict -> Explain -> Sign -> Offline Buffer -> Sync ->
-Verify -> Tamper Test -> Maintain -> Re-test -> Repair Verified -> Digital Passport.
-"""
-from __future__ import annotations
+import argparse
 
 from cloud.api.maintenance import (
     close_maintenance,
@@ -14,12 +8,13 @@ from cloud.api.maintenance import (
 from cloud.api.passport import get_passport
 from cloud.api.verification import ingest_and_verify, verification_status
 from cloud.storage.store import InMemoryEvidenceStore
+from edge.ai.adapter import BaselineDemonstratorModel
 from edge.connectivity.mqtt_client import MockCloudTransport
 from edge.orchestrator import EdgePipelineOrchestrator
 from edge.sensors.vibration import ReplayVibrationSensor
 
 
-def run_full_demo() -> None:
+def run_full_demo(force_baseline: bool = False) -> None:
     print("=" * 72)
     print("CYAPLANEX -- TATA TECHNOLOGIES INNOVENT 2026 DEMO SEQUENCE")
     print("Closed-Loop Edge AI Predictive Maintenance & Cryptographic Provenance")
@@ -29,13 +24,20 @@ def run_full_demo() -> None:
     # Step 1: Start the system
     cloud_store = InMemoryEvidenceStore()
     transport = MockCloudTransport(connected=True)
+    custom_model = BaselineDemonstratorModel() if force_baseline else None
     orchestrator = EdgePipelineOrchestrator(
         device_id="rpi5-edge-testbed",
         asset_id="aircraft-wing-lh",
         component_id="bearing-thrust-01",
         transport=transport,
+        model=custom_model,
     )
+    active_model = orchestrator.ml_adapter.model
+    model_mode = "BASELINE DEMONSTRATOR FIXTURE" if force_baseline else "PRODUCTION ML MODEL (Lead: Monhit Raju)"
     print("\n[Step 1] System started: Edge orchestrator and cloud verification initialized.")
+    print(f"         Active AI Engine: {model_mode}")
+    print(f"         Model ID:         {active_model.model_id} (v{active_model.model_version})")
+    print(f"         Model Hash:       {active_model.model_hash[:32]}...")
 
     # Step 2: Show healthy input
     healthy_out = orchestrator.execute_cycle(report_id="rep-demo-001")
@@ -60,10 +62,13 @@ def run_full_demo() -> None:
     print(f"         Action: {diagnostic_event['recommended_action']}")
 
     # Step 7: Show provenance metadata
+    hr = diagnostic_event["health_result"]
     print("[Step 7] Cryptographic Provenance generated:")
     print(f"         Sensor Window Hash: {diagnostic_event['sensor_window_hash'][:32]}...")
     print(f"         Manifest Hash:      {diagnostic_event['manifest_hash'][:32]}...")
     print(f"         Digital Signature:  {diagnostic_event['digital_signature'][:36]}...")
+    print(f"         Provenanced Model:  {hr.get('model_id')} (v{hr.get('model_version')})")
+    print(f"         Provenanced Hash:   {hr.get('model_hash')[:32]}...")
 
     # Step 8: Verify Provenance in backend
     _ingest_res = ingest_and_verify(diagnostic_event, store=cloud_store)
@@ -102,10 +107,16 @@ def run_full_demo() -> None:
 
     # Step 17: Start Re-test with fresh sensor window
     fresh_healthy_features = [0.35, 0.08, 48.0, 50.0, 3600.0, 10.0]
-    retest_res = perform_retest("rep-demo-002", fresh_features=fresh_healthy_features, store=cloud_store)
+    retest_res = perform_retest(
+        "rep-demo-002",
+        fresh_features=fresh_healthy_features,
+        store=cloud_store,
+        ml_adapter=orchestrator.ml_adapter,
+    )
+    metric_label = "[BASELINE DEMONSTRATOR METRIC]" if force_baseline else "[PRODUCTION MODEL METRIC]"
     print("\n[Step 17] Fresh Re-test executed against new sensor window.")
-    print(f"[Step 18] Post-maintenance Health Score: {retest_res['post_health_score']}% (Pre-score: {retest_res['pre_health_score']}%)")
-    print(f"[Step 19] Outcome: {retest_res['outcome']} (Repair Effectiveness: {retest_res['repair_effectiveness']:.2f})")
+    print(f"[Step 18] Post-maintenance Health Score: {retest_res['post_health_score']}% (Pre-score: {retest_res['pre_health_score']}%) {metric_label}")
+    print(f"[Step 19] Outcome: {retest_res['outcome']} (Repair Effectiveness: {retest_res['repair_effectiveness']:.2f}) {metric_label}")
     print(f"         Prompt: {retest_res['prompt']}")
 
     # Step 20: Create signed closure record and inspect digital passport
@@ -128,4 +139,13 @@ def run_full_demo() -> None:
 
 
 if __name__ == "__main__":
-    run_full_demo()
+    parser = argparse.ArgumentParser(
+        description="CyaplaneX End-to-End Closed-Loop Demonstrator."
+    )
+    parser.add_argument(
+        "--baseline",
+        action="store_true",
+        help="Execute using the baseline development demonstrator fixture instead of the production ML model.",
+    )
+    args = parser.parse_args()
+    run_full_demo(force_baseline=args.baseline)

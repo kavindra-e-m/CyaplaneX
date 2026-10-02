@@ -74,6 +74,14 @@ class CyaplaneXONNXModel:
         except Exception as err:
             raise RuntimeError(f"Failed to create ONNX InferenceSession for {self.onnx_path}: {err}") from err
 
+    @property
+    def model_id(self) -> str:
+        return self.MODEL_ID
+
+    @property
+    def model_version(self) -> str:
+        return self.MODEL_VERSION
+
     def predict(self, features: Sequence[float]) -> dict[str, Any]:
         """Execute inference against the frozen 6-feature contract vector using ONNX."""
         if len(features) != len(FROZEN_FEATURE_NAMES):

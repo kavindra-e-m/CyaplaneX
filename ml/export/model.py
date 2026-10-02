@@ -61,6 +61,14 @@ class CyaplaneXProductionModel:
         import hashlib
         self.model_hash = hashlib.sha256(self.artifact_path.read_bytes()).hexdigest()
 
+    @property
+    def model_id(self) -> str:
+        return self.MODEL_ID
+
+    @property
+    def model_version(self) -> str:
+        return self.MODEL_VERSION
+
     def predict(self, features: Sequence[float]) -> dict[str, Any]:
         """Execute inference against the frozen 6-feature contract vector.
 
