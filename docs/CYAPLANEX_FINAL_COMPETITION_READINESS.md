@@ -252,3 +252,11 @@ Before initiating a live competition jury demonstration:
 - [ ] **End-to-End Demo Verified:** `uv run python scripts/e2e_demo.py` completes with exit code 0.
 - [ ] **Interactive Dashboard Ready:** Open `dashboard/web/public/index.html` in Chrome/Edge; confirm all cards, gauges, and tamper test triggers respond.
 - [ ] **Slide Claims Aligned:** Verify all presentation slide metrics match the exact values in `docs/PPT_EVIDENCE.md`.
+
+---
+
+## 16. Final Competition Readiness Statement
+
+> **Canonical Competition Readiness Determination:**  
+> Software and demonstration baseline complete and verified; final competition preparation consists of physical HIL execution, optional live AWS validation, and final presentation assembly.
+
