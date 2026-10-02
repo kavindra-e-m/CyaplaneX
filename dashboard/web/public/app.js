@@ -14,7 +14,7 @@
     // Engine & Asset Identity
     assetId: "aircraft-wing-lh",
     componentId: "bearing-thrust-01",
-    engineSerial: "AIRC-CF34-01",
+    engineSerial: "AIRC-CF34-01 (Controlled Demo)",
     engineModel: "CF34-8E Turbofan",
 
     // Model Provenance Metadata
@@ -106,7 +106,7 @@
     "clo-1fc447c2": {
       id: "clo-1fc447c2",
       type: "MAINTENANCE_CLOSURE",
-      subtitle: "Record: clo-1fc447c2 • Certified Repair Closure & Passport Entry",
+      subtitle: "Record: clo-1fc447c2 • Cryptographically Verified Maintenance Closure & Passport Entry",
       asset: "aircraft-wing-lh",
       component: "bearing-thrust-01",
       timestamp: "2026-10-02T10:45:00Z",
@@ -126,7 +126,7 @@
       windowHash: "8a1e2f949281a0b3c9e472619028347102938475620194857201948572019485",
       signature: "hmac-sha256:71982ab91c8430e495a820491823901928374619283746192837461928374619",
       provenanceStatus: "PROVENANCE_VERIFIED",
-      repairAction: "Replaced thrust bearing with certified SKF Explorer 6205 assembly; torqued mountings to 45 Nm per AMM Chapter 72-00-02.",
+      repairAction: "Replaced thrust bearing with calibrated SKF Explorer 6205 assembly; torqued mountings to 45 Nm per AMM Chapter 72-00-02.",
       postHealth: "100.0% (Pre-repair: 7.7%)",
       repairEffectiveness: "0.92 (Threshold: \u2265 0.80) \u2192 REPAIR_VERIFIED",
       closureId: "clo-1fc447c2 (Added to Component Passport)"
@@ -793,7 +793,7 @@
     state.maintenanceState = "MAINTENANCE_IN_PROGRESS";
     state.selectedTimelineStage = 6;
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 6: Maintenance Started (Thrust Bearing Replacement In Progress)";
-    showToast("Maintenance Started: Component taken offline for certified repair.", false);
+    showToast("Maintenance Started: Component taken offline for scheduled repair.", false);
     render();
   }
 
@@ -935,10 +935,14 @@
 
     if (el.drawerBackdrop) el.drawerBackdrop.addEventListener("click", closeDrawer);
 
-    // Global Escape Key listener
+    // Global Accessibility & Keyboard listener
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape") {
         closeDrawer();
+      }
+      if ((e.key === "Enter" || e.key === " ") && e.target && e.target.getAttribute("role") === "button") {
+        e.preventDefault();
+        e.target.click();
       }
     });
 
