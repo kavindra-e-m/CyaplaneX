@@ -1,5 +1,5 @@
 // CyaplaneX Enterprise Aerospace MRO Platform — Client Controller
-// Reference-Driven Design System Implementation
+// Complete Interactive Engine & Reference-Driven Design Implementation
 
 (function() {
   "use strict";
@@ -33,7 +33,7 @@
     severity: "LOW", // "LOW" | "CRITICAL"
     priority: "P3 - NORMAL", // "P3 - NORMAL" | "P1 - CRITICAL"
 
-    // Sensor Readings (6-Feature Tuple Contract)
+    // Sensor Readings (Frozen 6-Feature Tuple Contract)
     vibrationRms: 0.35,
     vibrationP2p: 0.82,
     temperatureMean: 48.5,
@@ -46,7 +46,7 @@
     trustStatus: "TRUSTED", // "TRUSTED" | "DEGRADED"
 
     // Connectivity & Store-and-Forward Sync
-    connectivity: "ONLINE", // "ONLINE" | "OFFLINE"
+    connectivity: "ONLINE", // "ONLINE" | "SYNCING" | "OFFLINE"
     queueDepth: 0,
 
     // Cryptographic Provenance
@@ -58,14 +58,83 @@
     nonce: "n-550e8400-e29b-41d4-a716-446655440000",
 
     // MRO Maintenance Lifecycle State
-    maintenanceState: "NOMINAL", // "NOMINAL" | "MAINTENANCE_REQUIRED" | "MAINTENANCE_IN_PROGRESS" | "REPAIR_VERIFIED" | "CLOSED"
+    // "NOMINAL" | "MAINTENANCE_REQUIRED" | "MAINTENANCE_IN_PROGRESS" | "REPAIR_VERIFIED" | "CLOSED"
+    maintenanceState: "NOMINAL",
     repairEffectiveness: 0.92,
     currentReportId: "rep-demo-002",
-    closureId: "clo-1fc447c2"
+    closureId: "clo-1fc447c2",
+
+    // Active selected timeline stage
+    selectedTimelineStage: 1,
+
+    // Active Stream Mode
+    streamMode: "Live Telemetry • Flight-Line Stream"
   };
 
   // =========================================================================
-  // DOM Elements
+  // Canonical Event Database (For Specific Event Inspection)
+  // =========================================================================
+  const eventRecords = {
+    "rep-demo-002": {
+      id: "rep-demo-002",
+      type: "DIAGNOSTIC_EVENT",
+      subtitle: "Report: rep-demo-002 • Injected Vibration Fault Event",
+      asset: "aircraft-wing-lh",
+      component: "bearing-thrust-01",
+      timestamp: "2026-10-02T09:14:03Z",
+      seq: "Seq: 1 | n-550e84",
+      condition: "HIGH_VIBRATION",
+      health: 7.7,
+      severity: "CRITICAL",
+      anomaly: 0.94,
+      vibrationRms: 1.85,
+      vibrationP2p: 2.92,
+      tempMean: 54.2,
+      tempMax: 58.0,
+      rpmMean: 3600,
+      rpmStd: 14.2,
+      modelId: "cyaplanex-gb-aeromodel-v1 (v1.0.0)",
+      modelHash: "95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b",
+      windowHash: "73d4f37a6d157fe05e9ba5642fcf5dca658920192e44810938bb0912fa8901b2",
+      signature: "hmac-sha256:65332fe2cbde4f69093d30928475930294857201948572019485720194857201",
+      provenanceStatus: "PROVENANCE_VERIFIED",
+      repairAction: "Pending MRO action; work order WO-AERO-2026-002 dispatched.",
+      postHealth: "Pending re-test",
+      repairEffectiveness: "Pending inspection",
+      closureId: "Pending repair completion"
+    },
+    "clo-1fc447c2": {
+      id: "clo-1fc447c2",
+      type: "MAINTENANCE_CLOSURE",
+      subtitle: "Record: clo-1fc447c2 • Certified Repair Closure & Passport Entry",
+      asset: "aircraft-wing-lh",
+      component: "bearing-thrust-01",
+      timestamp: "2026-10-02T10:45:00Z",
+      seq: "Seq: 2 | n-771a92",
+      condition: "HEALTHY",
+      health: 100.0,
+      severity: "LOW",
+      anomaly: 0.08,
+      vibrationRms: 0.35,
+      vibrationP2p: 0.84,
+      tempMean: 48.5,
+      tempMax: 51.0,
+      rpmMean: 1750,
+      rpmStd: 4.8,
+      modelId: "cyaplanex-gb-aeromodel-v1 (v1.0.0)",
+      modelHash: "95ae7ef37e1fd3f32de96f33f60c2971514ca8ea21fc22a72d632f3166af643b",
+      windowHash: "8a1e2f949281a0b3c9e472619028347102938475620194857201948572019485",
+      signature: "hmac-sha256:71982ab91c8430e495a820491823901928374619283746192837461928374619",
+      provenanceStatus: "PROVENANCE_VERIFIED",
+      repairAction: "Replaced thrust bearing with certified SKF Explorer 6205 assembly; torqued mountings to 45 Nm per AMM Chapter 72-00-02.",
+      postHealth: "100.0% (Pre-repair: 7.7%)",
+      repairEffectiveness: "0.92 (Threshold: \u2265 0.80) \u2192 REPAIR_VERIFIED",
+      closureId: "clo-1fc447c2 (Added to Component Passport)"
+    }
+  };
+
+  // =========================================================================
+  // DOM Elements Cache
   // =========================================================================
   const el = {
     // Header & Badges
@@ -80,8 +149,15 @@
     txtProvenance: document.getElementById("txt-provenance"),
     dotProvenance: document.getElementById("dot-provenance"),
     lblDemoStatus: document.getElementById("lbl-demo-status"),
+    txtEngineSub: document.getElementById("txt-engine-sub"),
+    filterPill: document.querySelector(".filter-pill"),
 
     // KPI Cards
+    cardKpiStatus: document.getElementById("card-kpi-status"),
+    cardKpiHealth: document.getElementById("card-kpi-health"),
+    cardKpiRisk: document.getElementById("card-kpi-risk"),
+    cardKpiPriority: document.getElementById("card-kpi-priority"),
+    cardKpiAlerts: document.getElementById("card-kpi-alerts"),
     kpiSysStatus: document.getElementById("kpi-sys-status"),
     kpiSysSub: document.getElementById("kpi-sys-sub"),
     kpiHealthScore: document.getElementById("kpi-health-score"),
@@ -91,7 +167,7 @@
     kpiAlerts: document.getElementById("kpi-alerts"),
     kpiAlertsSub: document.getElementById("kpi-alerts-sub"),
 
-    // Sensor Overview
+    // Sensor Overview (Left Panel)
     valVibration: document.getElementById("val-vibration"),
     valTemperature: document.getElementById("val-temperature"),
     valRpm: document.getElementById("val-rpm"),
@@ -99,8 +175,11 @@
     trustTemperature: document.getElementById("trust-temperature"),
     trustRpm: document.getElementById("trust-rpm"),
     badgeAggregateTrust: document.getElementById("badge-aggregate-trust"),
+    srowVibration: document.getElementById("srow-vibration"),
+    srowTemperature: document.getElementById("srow-temperature"),
+    srowRpm: document.getElementById("srow-rpm"),
 
-    // Callout Overlays on Engine Visual
+    // Callout Overlays on Central Engine Visual
     coutVibration: document.getElementById("cout-vibration"),
     coutStatusVib: document.getElementById("cout-status-vib"),
     coutTemp: document.getElementById("cout-temp"),
@@ -108,7 +187,7 @@
     coutRpm: document.getElementById("cout-rpm"),
     coutStatusRpm: document.getElementById("cout-status-rpm"),
 
-    // Predictive Insights
+    // Predictive Insights (Right Panel)
     insConditionText: document.getElementById("ins-condition-text"),
     insModelHash: document.getElementById("ins-model-hash"),
     insConfidence: document.getElementById("ins-confidence"),
@@ -118,8 +197,11 @@
     // Evidence Drawer
     drawer: document.getElementById("evidence-drawer"),
     drawerBackdrop: document.getElementById("drawer-backdrop"),
+    drawerSubtitle: document.getElementById("drawer-subtitle"),
     drwBadgeProv: document.getElementById("drw-badge-prov"),
     drwEventId: document.getElementById("drw-event-id"),
+    drwTime: document.getElementById("drw-time"),
+    drwSeq: document.getElementById("drw-seq"),
     drwVibRms: document.getElementById("drw-vib-rms"),
     drwVibP2p: document.getElementById("drw-vib-p2p"),
     drwTempMean: document.getElementById("drw-temp-mean"),
@@ -133,6 +215,10 @@
     drwModhash: document.getElementById("drw-modhash"),
     drwWinhash: document.getElementById("drw-winhash"),
     drwSig: document.getElementById("drw-sig"),
+    drwRepairAction: document.getElementById("drw-repair-action"),
+    drwPostHealth: document.getElementById("drw-post-health"),
+    drwEff: document.getElementById("drw-eff"),
+    drwClosureId: document.getElementById("drw-closure-id"),
 
     // Provenance Tab Elements
     txtProvWinhash: document.getElementById("txt-prov-winhash"),
@@ -142,18 +228,35 @@
     txtTamperResult: document.getElementById("txt-tamper-result"),
     provStatusTag: document.getElementById("prov-status-tag"),
 
-    // Sensors Tab
+    // Sensors Tab (Gate B)
     stVibVal: document.getElementById("st-vib-val"),
     stTempVal: document.getElementById("st-temp-val"),
     stRpmVal: document.getElementById("st-rpm-val"),
     stVibTrust: document.getElementById("st-vib-trust"),
 
-    // Table elements
+    // Workbench Tab Elements
+    wbStatusTag: document.getElementById("wb-status-tag"),
+    wbBtnStart: document.getElementById("wb-btn-start"),
+    wbBtnRetest: document.getElementById("wb-btn-retest"),
+    wbBtnClose: document.getElementById("wb-btn-close"),
+    wbBtnEvidence: document.getElementById("wb-btn-evidence"),
+    stageInProg: document.getElementById("stage-in-prog"),
+    stageRetest: document.getElementById("stage-retest"),
+    stageVerified: document.getElementById("stage-verified"),
+    stageClosed: document.getElementById("stage-closed"),
+
+    // Tables
     tblAlertCond: document.getElementById("tbl-alert-cond"),
     tblAlertScore: document.getElementById("tbl-alert-score"),
     tblAlertProv: document.getElementById("tbl-alert-prov"),
     tblTaskPrio: document.getElementById("tbl-task-prio"),
     tblTaskStatus: document.getElementById("tbl-task-status"),
+
+    // Chart Canvas & Tooltips
+    svgChartVibration: document.getElementById("svg-chart-vibration"),
+    tooltipVib: document.getElementById("tooltip-vib"),
+    svgChartTemp: document.getElementById("svg-chart-temp"),
+    tooltipTemp: document.getElementById("tooltip-temp"),
 
     // Toast Container
     toastContainer: document.getElementById("toast-container")
@@ -174,12 +277,10 @@
     toast.innerHTML = `<span>${message}</span>`;
     el.toastContainer.appendChild(toast);
 
-    // Animate in
     setTimeout(function() {
       toast.classList.add("show");
     }, 10);
 
-    // Remove after 3s
     setTimeout(function() {
       toast.classList.remove("show");
       setTimeout(function() {
@@ -189,7 +290,47 @@
   }
 
   // =========================================================================
-  // UI Render & Synchronization
+  // Clipboard Copy Utility with Visual Button State Transition
+  // =========================================================================
+  function copyTextToClipboard(text, btnElement) {
+    if (btnElement) {
+      const originalText = btnElement.textContent;
+      btnElement.textContent = "COPIED";
+      btnElement.classList.add("copied");
+      setTimeout(function() {
+        btnElement.textContent = originalText;
+        btnElement.classList.remove("copied");
+      }, 1500);
+    }
+
+    showToast("SHA-256 Hash copied to clipboard!", false);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch {
+      // silent fallback
+    }
+  }
+
+  // =========================================================================
+  // UI Render & Complete Synchronization
   // =========================================================================
   function render() {
     // 1. Top Badges
@@ -202,6 +343,10 @@
         el.txtConnectivity.textContent = "ONLINE";
         el.badgeConnectivity.className = "system-status-badge badge-optimal";
         el.dotConnectivity.className = "status-dot dot-green";
+      } else if (state.connectivity === "SYNCING") {
+        el.txtConnectivity.textContent = "SYNCING (1 EVENT)...";
+        el.badgeConnectivity.className = "system-status-badge badge-offline";
+        el.dotConnectivity.className = "status-dot dot-amber";
       } else {
         el.txtConnectivity.textContent = `OFFLINE (${state.queueDepth} BUFFERED)`;
         el.badgeConnectivity.className = "system-status-badge badge-offline";
@@ -226,7 +371,7 @@
       el.kpiSysStatus.textContent = state.systemStatus;
       if (state.systemStatus === "HEALTHY") {
         el.kpiSysStatus.style.color = "var(--status-success)";
-        if (el.kpiSysSub) el.kpiSysSub.textContent = "Nominal Flight Operating Envelope";
+        if (el.kpiSysSub) el.kpiSysSub.textContent = "Nominal Flight Envelope";
       } else {
         el.kpiSysStatus.style.color = "var(--status-critical)";
         if (el.kpiSysSub) el.kpiSysSub.textContent = "Dynamic Bearing Anomaly Detected";
@@ -294,6 +439,9 @@
     if (el.insModelHash) {
       el.insModelHash.textContent = `${state.modelHash.slice(0, 16)}...`;
     }
+    if (el.insConfidence) {
+      el.insConfidence.textContent = `${(state.confidence * 100).toFixed(0)}%`;
+    }
     if (el.insSeverity) {
       el.insSeverity.textContent = state.severity;
       el.insSeverity.style.color = state.severity === "LOW" ? "var(--status-success)" : "var(--status-critical)";
@@ -306,34 +454,17 @@
       }
     }
 
-    // 6. Evidence Drawer Fields
-    if (el.drwCond) el.drwCond.textContent = state.condition;
-    if (el.drwHealth) el.drwHealth.textContent = `${state.healthScore.toFixed(1)}%`;
-    if (el.drwSev) el.drwSev.textContent = state.severity;
-    if (el.drwAnomaly) el.drwAnomaly.textContent = state.anomalyScore.toFixed(2);
-    if (el.drwVibRms) el.drwVibRms.textContent = `${state.vibrationRms.toFixed(2)} g`;
-    if (el.drwVibP2p) el.drwVibP2p.textContent = `${state.vibrationP2p.toFixed(2)} g`;
-    if (el.drwTempMean) el.drwTempMean.textContent = `${state.temperatureMean.toFixed(1)} °C`;
-    if (el.drwTempMax) el.drwTempMax.textContent = `${state.temperatureMax.toFixed(1)} °C`;
-    if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(state.rpmMean)} rpm`;
-    if (el.drwRpmStd) el.drwRpmStd.textContent = `${state.rpmStd.toFixed(1)} rpm`;
-
-    if (el.drwBadgeProv) {
-      el.drwBadgeProv.textContent = state.provenanceStatus === "PROVENANCE_VERIFIED" ? "VERIFIED" : "VIOLATION";
-      el.drwBadgeProv.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
-    }
-
-    // 7. Provenance Tab
+    // 6. Provenance Tab
     if (el.txtProvWinhash) el.txtProvWinhash.textContent = state.windowHash;
     if (el.txtProvManhash) el.txtProvManhash.textContent = state.manifestHash;
     if (el.txtProvModhash) el.txtProvModhash.textContent = state.modelHash;
     if (el.txtProvSignature) el.txtProvSignature.textContent = state.signature;
     if (el.provStatusTag) {
-      el.provStatusTag.textContent = state.provenanceStatus;
+      el.provStatusTag.textContent = state.provenanceStatus === "PROVENANCE_VERIFIED" ? "PROVENANCE VERIFIED" : "PROVENANCE VIOLATION";
       el.provStatusTag.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
     }
 
-    // 8. Sensors Tab
+    // 7. Sensors Tab
     if (el.stVibVal) el.stVibVal.textContent = `${state.vibrationRms.toFixed(2)} g`;
     if (el.stTempVal) el.stTempVal.textContent = `${state.temperatureMean.toFixed(1)} °C`;
     if (el.stRpmVal) el.stRpmVal.textContent = `${Math.round(state.rpmMean)} rpm`;
@@ -342,7 +473,7 @@
       el.stVibTrust.className = `trust-badge-pill ${state.trustStatus === "TRUSTED" ? "trusted" : "degraded"}`;
     }
 
-    // 9. Tables
+    // 8. Tables
     if (el.tblAlertCond) el.tblAlertCond.textContent = state.condition;
     if (el.tblAlertScore) {
       el.tblAlertScore.textContent = `${state.healthScore.toFixed(1)}%`;
@@ -351,6 +482,80 @@
     if (el.tblAlertProv) {
       el.tblAlertProv.textContent = state.provenanceStatus;
       el.tblAlertProv.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
+    }
+
+    // 9. Workbench State Machine Synchronization
+    renderWorkbenchState();
+
+    // 10. Timeline Node Highlight Synchronization
+    renderTimelineNodes();
+  }
+
+  // =========================================================================
+  // Maintenance Workbench State Engine
+  // =========================================================================
+  function renderWorkbenchState() {
+    if (!el.wbStatusTag) return;
+
+    // Reset breadcrumb highlights
+    const mutedColor = "var(--text-muted)";
+    const orangeColor = "var(--accent-orange)";
+    const greenColor = "var(--status-success)";
+
+    if (el.stageInProg) el.stageInProg.style.color = mutedColor;
+    if (el.stageRetest) el.stageRetest.style.color = mutedColor;
+    if (el.stageVerified) el.stageVerified.style.color = mutedColor;
+    if (el.stageClosed) el.stageClosed.style.color = mutedColor;
+
+    if (state.maintenanceState === "NOMINAL") {
+      el.wbStatusTag.textContent = "STAGE: NOMINAL / IDLE";
+      if (el.wbBtnStart) el.wbBtnStart.disabled = false;
+      if (el.wbBtnRetest) el.wbBtnRetest.disabled = true;
+      if (el.wbBtnClose) el.wbBtnClose.disabled = true;
+    } else if (state.maintenanceState === "MAINTENANCE_REQUIRED") {
+      el.wbStatusTag.textContent = "STAGE: WORK ORDER DISPATCHED (P1)";
+      if (el.wbBtnStart) el.wbBtnStart.disabled = false;
+      if (el.wbBtnRetest) el.wbBtnRetest.disabled = true;
+      if (el.wbBtnClose) el.wbBtnClose.disabled = true;
+    } else if (state.maintenanceState === "MAINTENANCE_IN_PROGRESS") {
+      el.wbStatusTag.textContent = "STAGE: MAINTENANCE IN PROGRESS";
+      if (el.stageInProg) el.stageInProg.style.color = orangeColor;
+      if (el.wbBtnStart) el.wbBtnStart.disabled = true;
+      if (el.wbBtnRetest) el.wbBtnRetest.disabled = false;
+      if (el.wbBtnClose) el.wbBtnClose.disabled = true;
+    } else if (state.maintenanceState === "REPAIR_VERIFIED") {
+      el.wbStatusTag.textContent = "STAGE: REPAIR VERIFIED (Eff: 0.92)";
+      if (el.stageInProg) el.stageInProg.style.color = greenColor;
+      if (el.stageRetest) el.stageRetest.style.color = greenColor;
+      if (el.stageVerified) el.stageVerified.style.color = greenColor;
+      if (el.wbBtnStart) el.wbBtnStart.disabled = true;
+      if (el.wbBtnRetest) el.wbBtnRetest.disabled = true;
+      if (el.wbBtnClose) el.wbBtnClose.disabled = false;
+    } else if (state.maintenanceState === "CLOSED") {
+      el.wbStatusTag.textContent = "STAGE: ORDER CLOSED (IN PASSPORT)";
+      if (el.stageInProg) el.stageInProg.style.color = greenColor;
+      if (el.stageRetest) el.stageRetest.style.color = greenColor;
+      if (el.stageVerified) el.stageVerified.style.color = greenColor;
+      if (el.stageClosed) el.stageClosed.style.color = greenColor;
+      if (el.wbBtnStart) el.wbBtnStart.disabled = true;
+      if (el.wbBtnRetest) el.wbBtnRetest.disabled = true;
+      if (el.wbBtnClose) el.wbBtnClose.disabled = true;
+    }
+  }
+
+  // =========================================================================
+  // Timeline Highlight Synchronization
+  // =========================================================================
+  function renderTimelineNodes() {
+    for (let i = 1; i <= 9; i++) {
+      const node = document.getElementById(`tnode-${i}`);
+      if (node) {
+        if (i === state.selectedTimelineStage) {
+          node.classList.add("active");
+        } else {
+          node.classList.remove("active");
+        }
+      }
     }
   }
 
@@ -394,7 +599,82 @@
   }
 
   // =========================================================================
-  // Demonstration Scenarios
+  // Evidence Drawer Controls (Specific Event Context Injection)
+  // =========================================================================
+  function openDrawer(eventId) {
+    const targetId = eventId || state.currentReportId;
+    const record = eventRecords[targetId];
+
+    if (record) {
+      // Inject specific record context
+      if (el.drwEventId) el.drwEventId.textContent = record.id;
+      if (el.drawerSubtitle) el.drawerSubtitle.textContent = record.subtitle;
+      if (el.drwTime) el.drwTime.textContent = record.timestamp;
+      if (el.drwSeq) el.drwSeq.textContent = record.seq;
+      if (el.drwCond) {
+        el.drwCond.textContent = record.condition;
+        el.drwCond.style.color = record.condition === "HEALTHY" ? "var(--status-success)" : "var(--status-critical)";
+      }
+      if (el.drwHealth) el.drwHealth.textContent = `${record.health.toFixed(1)}%`;
+      if (el.drwSev) el.drwSev.textContent = record.severity;
+      if (el.drwAnomaly) el.drwAnomaly.textContent = record.anomaly.toFixed(2);
+      if (el.drwVibRms) el.drwVibRms.textContent = `${record.vibrationRms.toFixed(2)} g`;
+      if (el.drwVibP2p) el.drwVibP2p.textContent = `${record.vibrationP2p.toFixed(2)} g`;
+      if (el.drwTempMean) el.drwTempMean.textContent = `${record.tempMean.toFixed(1)} °C`;
+      if (el.drwTempMax) el.drwTempMax.textContent = `${record.tempMax.toFixed(1)} °C`;
+      if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(record.rpmMean).toLocaleString()} rpm`;
+      if (el.drwRpmStd) el.drwRpmStd.textContent = `${record.rpmStd.toFixed(1)} rpm`;
+
+      if (el.drwModhash) el.drwModhash.textContent = record.modelHash;
+      if (el.drwWinhash) el.drwWinhash.textContent = record.windowHash;
+      if (el.drwSig) el.drwSig.textContent = record.signature;
+
+      if (el.drwBadgeProv) {
+        const isViolation = (targetId === "rep-demo-002" && state.provenanceStatus === "PROVENANCE_VIOLATION");
+        el.drwBadgeProv.textContent = isViolation ? "PROVENANCE VIOLATION" : "VERIFIED";
+        el.drwBadgeProv.className = `trust-badge-pill ${isViolation ? "degraded" : "trusted"}`;
+      }
+
+      if (el.drwRepairAction) el.drwRepairAction.textContent = record.repairAction;
+      if (el.drwPostHealth) el.drwPostHealth.textContent = record.postHealth;
+      if (el.drwEff) el.drwEff.textContent = record.repairEffectiveness;
+      if (el.drwClosureId) el.drwClosureId.textContent = record.closureId;
+    } else {
+      // Dynamic live view based on current state
+      if (el.drwEventId) el.drwEventId.textContent = state.currentReportId;
+      if (el.drawerSubtitle) el.drawerSubtitle.textContent = `Report: ${state.currentReportId} • Live Engine Telemetry`;
+      if (el.drwCond) el.drwCond.textContent = state.condition;
+      if (el.drwHealth) el.drwHealth.textContent = `${state.healthScore.toFixed(1)}%`;
+      if (el.drwSev) el.drwSev.textContent = state.severity;
+      if (el.drwAnomaly) el.drwAnomaly.textContent = state.anomalyScore.toFixed(2);
+      if (el.drwVibRms) el.drwVibRms.textContent = `${state.vibrationRms.toFixed(2)} g`;
+      if (el.drwVibP2p) el.drwVibP2p.textContent = `${state.vibrationP2p.toFixed(2)} g`;
+      if (el.drwTempMean) el.drwTempMean.textContent = `${state.temperatureMean.toFixed(1)} °C`;
+      if (el.drwTempMax) el.drwTempMax.textContent = `${state.temperatureMax.toFixed(1)} °C`;
+      if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(state.rpmMean).toLocaleString()} rpm`;
+      if (el.drwRpmStd) el.drwRpmStd.textContent = `${state.rpmStd.toFixed(1)} rpm`;
+
+      if (el.drwBadgeProv) {
+        el.drwBadgeProv.textContent = state.provenanceStatus === "PROVENANCE_VERIFIED" ? "VERIFIED" : "PROVENANCE VIOLATION";
+        el.drwBadgeProv.className = `trust-badge-pill ${state.provenanceStatus === "PROVENANCE_VERIFIED" ? "trusted" : "degraded"}`;
+      }
+    }
+
+    if (el.drawer && el.drawerBackdrop) {
+      el.drawerBackdrop.classList.add("open");
+      el.drawer.classList.add("open");
+    }
+  }
+
+  function closeDrawer() {
+    if (el.drawer && el.drawerBackdrop) {
+      el.drawerBackdrop.classList.remove("open");
+      el.drawer.classList.remove("open");
+    }
+  }
+
+  // =========================================================================
+  // Demonstration Scenarios & State Machine Actions
   // =========================================================================
   function setScenarioHealthy() {
     state.systemStatus = "HEALTHY";
@@ -409,11 +689,13 @@
     state.temperatureMean = 48.5;
     state.temperatureMax = 51.0;
     state.rpmMean = 1750;
+    state.rpmStd = 4.8;
     state.trustStatus = "TRUSTED";
     state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.connectivity = "ONLINE";
     state.queueDepth = 0;
     state.maintenanceState = "NOMINAL";
+    state.selectedTimelineStage = 1;
 
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 1: Nominal Flight-Ready Baseline Active (100% Health)";
     showToast("Reset to Nominal Baseline: Model cyaplanex-gb-aeromodel-v1 active.", false);
@@ -433,9 +715,11 @@
     state.temperatureMean = 54.2;
     state.temperatureMax = 58.0;
     state.rpmMean = 3600;
+    state.rpmStd = 14.2;
     state.trustStatus = "DEGRADED";
     state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.maintenanceState = "MAINTENANCE_REQUIRED";
+    state.selectedTimelineStage = 3;
 
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 2: Dynamic Fault Injected (7.7% Health, Priority P1 Dispatched)";
     showToast("Fault Injected: Vibration 1.85g. Model diagnosed HIGH_VIBRATION (7.7% Health).", true);
@@ -445,7 +729,7 @@
   function setScenarioTamper() {
     state.provenanceStatus = "PROVENANCE_VIOLATION";
     if (el.txtTamperResult) {
-      el.txtTamperResult.innerHTML = "<span style='color: var(--status-critical);'>Tamper Detected! Payload altered from 7.7% to 99.0%. HMAC Signature Mismatch &rarr; PROVENANCE_VIOLATION (100% Rejection).</span>";
+      el.txtTamperResult.innerHTML = "<span style='color: var(--status-critical); font-weight: 700;'>Tamper Detected! Payload altered from 7.7% to 99.0%. HMAC Signature Mismatch &rarr; PROVENANCE_VIOLATION (100% Rejection).</span>";
     }
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 3: Tamper Attack Rejection (PROVENANCE_VIOLATION)";
     showToast("PROVENANCE_VIOLATION: Altered health score rejected by cryptographic verifier.", true);
@@ -461,23 +745,42 @@
   }
 
   function setScenarioReconnect() {
-    state.connectivity = "ONLINE";
-    const drained = state.queueDepth;
-    state.queueDepth = 0;
-    state.provenanceStatus = "PROVENANCE_VERIFIED";
-    if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 5: Connection Restored (Lossless Sequence Sync Complete)";
-    showToast(`Reconnected: Synchronized ${drained} buffered event(s) in strict sequence.`, false);
+    if (state.connectivity === "ONLINE" && state.queueDepth === 0) {
+      showToast("System already online. All events are in sync.", false);
+      return;
+    }
+
+    state.connectivity = "SYNCING";
     render();
+
+    setTimeout(function() {
+      const drained = state.queueDepth || 1;
+      state.connectivity = "ONLINE";
+      state.queueDepth = 0;
+      state.provenanceStatus = "PROVENANCE_VERIFIED";
+      if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 5: Connection Restored (Lossless Sequence Sync Complete)";
+      showToast(`Reconnected: Synchronized ${drained} buffered event(s) in strict sequence.`, false);
+      render();
+    }, 600);
   }
 
   function setScenarioMaintain() {
+    if (state.systemStatus === "HEALTHY" && state.maintenanceState === "NOMINAL") {
+      showToast("Starting routine maintenance overhaul on bearing-thrust-01...", false);
+    }
     state.maintenanceState = "MAINTENANCE_IN_PROGRESS";
+    state.selectedTimelineStage = 6;
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 6: Maintenance Started (Thrust Bearing Replacement In Progress)";
     showToast("Maintenance Started: Component taken offline for certified repair.", false);
     render();
   }
 
   function setScenarioRetest() {
+    if (state.maintenanceState !== "MAINTENANCE_IN_PROGRESS" && state.maintenanceState !== "REPAIR_VERIFIED" && state.maintenanceState !== "CLOSED") {
+      showToast("Repair must be initiated first. Starting repair now...", false);
+      state.maintenanceState = "MAINTENANCE_IN_PROGRESS";
+    }
+
     state.systemStatus = "HEALTHY";
     state.healthScore = 100.0;
     state.failureRisk = 2.4;
@@ -488,61 +791,81 @@
     state.vibrationRms = 0.35;
     state.vibrationP2p = 0.84;
     state.temperatureMean = 48.5;
+    state.temperatureMax = 51.0;
     state.rpmMean = 1750;
+    state.rpmStd = 4.8;
     state.trustStatus = "TRUSTED";
     state.provenanceStatus = "PROVENANCE_VERIFIED";
     state.maintenanceState = "REPAIR_VERIFIED";
+    state.selectedTimelineStage = 8;
 
     if (el.lblDemoStatus) el.lblDemoStatus.textContent = "Step 7: Fresh Re-Test Verified (Effectiveness: 0.92, REPAIR_VERIFIED)";
-    showToast("Fresh Re-test Passed: Repair Effectiveness = 0.92 [PRODUCTION MODEL]. Closure appended to Digital Passport.", false);
+    showToast("Fresh Re-test Passed: Repair Effectiveness = 0.92 [PRODUCTION MODEL]. Closure ready for Passport.", false);
     render();
   }
 
-  // =========================================================================
-  // Evidence Drawer Controls
-  // =========================================================================
-  function openDrawer(eventId) {
-    if (el.drwEventId && eventId) el.drwEventId.textContent = eventId;
-    if (el.drawer && el.drawerBackdrop) {
-      el.drawerBackdrop.classList.add("open");
-      el.drawer.classList.add("open");
+  function closeMaintenanceWorkOrder() {
+    if (state.maintenanceState !== "REPAIR_VERIFIED") {
+      showToast("A fresh re-test must verify the repair before closing the work order.", true);
+      return;
     }
-  }
 
-  function closeDrawer() {
-    if (el.drawer && el.drawerBackdrop) {
-      el.drawerBackdrop.classList.remove("open");
-      el.drawer.classList.remove("open");
-    }
+    state.maintenanceState = "CLOSED";
+    state.selectedTimelineStage = 9;
+    showToast("Work Order WO-AERO-2026-002 closed. Signed ClosureRecord clo-1fc447c2 appended to Digital Passport.", false);
+    render();
+    setTimeout(function() {
+      switchView("view-passport");
+    }, 400);
   }
 
   // =========================================================================
-  // Clipboard Copy Utility
+  // Chart Hover Tooltip Controller
   // =========================================================================
-  function copyTextToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        showToast("SHA-256 Hash copied to clipboard!", false);
-      }).catch(function() {
-        showToast("Copied to clipboard.", false);
+  function setupChartTooltips() {
+    if (el.svgChartVibration && el.tooltipVib) {
+      el.svgChartVibration.addEventListener("mousemove", function(e) {
+        const rect = el.svgChartVibration.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, mouseX / rect.width));
+        const val = (pct > 0.65 && state.systemStatus !== "HEALTHY") ? 1.85 : (0.28 + pct * 0.12);
+        const status = val > 0.8 ? "ANOMALY" : "TRUSTED";
+
+        el.tooltipVib.innerHTML = `Vib RMS: <strong>${val.toFixed(2)}g</strong> • ${status}`;
+        el.tooltipVib.style.left = `${mouseX}px`;
+        el.tooltipVib.style.top = `${e.clientY - rect.top}px`;
+        el.tooltipVib.classList.add("show");
       });
-    } else {
-      // Fallback
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      showToast("SHA-256 Hash copied to clipboard!", false);
+
+      el.svgChartVibration.addEventListener("mouseleave", function() {
+        el.tooltipVib.classList.remove("show");
+      });
+    }
+
+    if (el.svgChartTemp && el.tooltipTemp) {
+      el.svgChartTemp.addEventListener("mousemove", function(e) {
+        const rect = el.svgChartTemp.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, mouseX / rect.width));
+        const temp = 45.0 + pct * 6.5;
+
+        el.tooltipTemp.innerHTML = `Temp: <strong>${temp.toFixed(1)}°C</strong> • NOMINAL`;
+        el.tooltipTemp.style.left = `${mouseX}px`;
+        el.tooltipTemp.style.top = `${e.clientY - rect.top}px`;
+        el.tooltipTemp.classList.add("show");
+      });
+
+      el.svgChartTemp.addEventListener("mouseleave", function() {
+        el.tooltipTemp.classList.remove("show");
+      });
     }
   }
 
   // =========================================================================
-  // Event Listeners & Binding
+  // Event Listeners & Complete Element Binding
   // =========================================================================
   function setupEventListeners() {
-    // 1. Navigation Item Clicks
+    // 1. Navigation Rail Item Clicks
     const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach(function(item) {
       item.addEventListener("click", function() {
@@ -559,7 +882,7 @@
       });
     }
 
-    // 2. Demo Bar Scene Triggers
+    // 2. Demo Toolbar Scene Triggers
     const btnHealthy = document.getElementById("btn-scene-healthy");
     if (btnHealthy) btnHealthy.addEventListener("click", setScenarioHealthy);
 
@@ -584,13 +907,56 @@
     const btnOpenDrawer = document.getElementById("btn-open-drawer");
     if (btnOpenDrawer) btnOpenDrawer.addEventListener("click", function() { openDrawer(state.currentReportId); });
 
-    // 3. Drawer Controls
+    // 3. Evidence Drawer Controls & Backdrop
     const btnCloseDrawer = document.getElementById("btn-close-drawer");
     if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", closeDrawer);
 
     if (el.drawerBackdrop) el.drawerBackdrop.addEventListener("click", closeDrawer);
 
-    // 4. Central Engine Visual Sensor Points
+    // Global Escape Key listener
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        closeDrawer();
+      }
+    });
+
+    // 4. KPI Cards Interactive Clicks
+    if (el.cardKpiStatus) {
+      el.cardKpiStatus.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting System Status Diagnostic Evidence.", false);
+      });
+    }
+
+    if (el.cardKpiHealth) {
+      el.cardKpiHealth.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Health Score Evidence & Feature Vector.", false);
+      });
+    }
+
+    if (el.cardKpiRisk) {
+      el.cardKpiRisk.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Anomaly Probability & Diagnosis.", false);
+      });
+    }
+
+    if (el.cardKpiPriority) {
+      el.cardKpiPriority.addEventListener("click", function() {
+        switchView("view-maintenance");
+        showToast("Navigated to MRO Maintenance Workbench.", false);
+      });
+    }
+
+    if (el.cardKpiAlerts) {
+      el.cardKpiAlerts.addEventListener("click", function() {
+        switchView("view-provenance");
+        showToast("Navigated to Cryptographic Provenance Evidence.", false);
+      });
+    }
+
+    // 5. Central Engine Visual Sensors & Callouts
     const ptVib = document.getElementById("pulse-pt-vib");
     const coutVib = document.getElementById("callout-vib");
     const srowVib = document.getElementById("srow-vibration");
@@ -598,7 +964,7 @@
       if (node) {
         node.addEventListener("click", function() {
           openDrawer(state.currentReportId);
-          showToast("Inspecting Bearing-Thrust-01 Vibration Telemetry.", false);
+          showToast("Inspecting ADXL345 Thrust Bearing Vibration Telemetry.", false);
         });
       }
     });
@@ -610,7 +976,7 @@
       if (node) {
         node.addEventListener("click", function() {
           openDrawer(state.currentReportId);
-          showToast("Inspecting Bearing Housing Temperature Telemetry.", false);
+          showToast("Inspecting MAX6675 Bearing Cap Thermal Telemetry.", false);
         });
       }
     });
@@ -622,12 +988,83 @@
       if (node) {
         node.addEventListener("click", function() {
           openDrawer(state.currentReportId);
-          showToast("Inspecting Shaft RPM Telemetry.", false);
+          showToast("Inspecting A3144 Hall-Effect Shaft RPM Telemetry.", false);
         });
       }
     });
 
-    // 5. Workbench Buttons
+    // 6. Gate B Sensor Table Rows in #view-sensors
+    const stRowVib = document.getElementById("st-row-vib");
+    if (stRowVib) {
+      stRowVib.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Gate B ADXL345 Vibration Trust Metrics.", false);
+      });
+    }
+
+    const stRowTemp = document.getElementById("st-row-temp");
+    if (stRowTemp) {
+      stRowTemp.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Gate B MAX6675 Temperature Trust Metrics.", false);
+      });
+    }
+
+    const stRowRpm = document.getElementById("st-row-rpm");
+    if (stRowRpm) {
+      stRowRpm.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Gate B A3144 RPM Trust Metrics.", false);
+      });
+    }
+
+    // 7. Timeline Nodes Interaction (#tnode-1 to #tnode-9)
+    for (let i = 1; i <= 9; i++) {
+      const tnode = document.getElementById(`tnode-${i}`);
+      if (tnode) {
+        tnode.addEventListener("click", function() {
+          state.selectedTimelineStage = i;
+          renderTimelineNodes();
+
+          if (i === 1) {
+            openDrawer(state.currentReportId);
+            showToast("Timeline Stage 1: Telemetry Ingest snapshot opened in drawer.", false);
+          } else if (i === 2) {
+            switchView("view-sensors");
+            showToast("Timeline Stage 2: Gate B Sensor Trust Adjudication Panel.", false);
+          } else if (i === 3) {
+            openDrawer(state.currentReportId);
+            showToast("Timeline Stage 3: Machine Learning Diagnostic Classification.", false);
+          } else if (i === 4) {
+            switchView("view-provenance");
+            showToast("Timeline Stage 4: Device-Local HMAC-SHA256 Manifest Signing.", false);
+          } else if (i === 5) {
+            switchView("view-maintenance");
+            showToast("Timeline Stage 5: MRO Maintenance Priority Dispatched.", false);
+          } else if (i === 6) {
+            switchView("view-maintenance");
+            showToast("Timeline Stage 6: Mechanical Assembly Replacement & Torque.", false);
+          } else if (i === 7) {
+            openDrawer(state.currentReportId);
+            showToast("Timeline Stage 7: Fresh Post-Maintenance Sensor Window.", false);
+          } else if (i === 8) {
+            openDrawer("clo-1fc447c2");
+            showToast("Timeline Stage 8: Quantitative Repair Verification (Eff: 0.92).", false);
+          } else if (i === 9) {
+            switchView("view-passport");
+            showToast("Timeline Stage 9: Signed Closure Record Appended to Digital Passport.", false);
+          }
+        });
+      }
+    }
+
+    // 8. Workbench Action Buttons
+    if (el.wbBtnStart) el.wbBtnStart.addEventListener("click", setScenarioMaintain);
+    if (el.wbBtnRetest) el.wbBtnRetest.addEventListener("click", setScenarioRetest);
+    if (el.wbBtnClose) el.wbBtnClose.addEventListener("click", closeMaintenanceWorkOrder);
+    if (el.wbBtnEvidence) el.wbBtnEvidence.addEventListener("click", function() { openDrawer(state.currentReportId); });
+
+    // 9. View CTAs
     const btnViewWb = document.getElementById("btn-view-workbench");
     const btnGotoMro = document.getElementById("btn-goto-mro");
     [btnViewWb, btnGotoMro].forEach(function(b) {
@@ -638,16 +1075,14 @@
       }
     });
 
-    const wbBtnStart = document.getElementById("wb-btn-start");
-    if (wbBtnStart) wbBtnStart.addEventListener("click", setScenarioMaintain);
+    const btnOpenAlertsEvidence = document.getElementById("btn-open-alerts-evidence");
+    if (btnOpenAlertsEvidence) {
+      btnOpenAlertsEvidence.addEventListener("click", function() {
+        switchView("view-provenance");
+      });
+    }
 
-    const wbBtnRetest = document.getElementById("wb-btn-retest");
-    if (wbBtnRetest) wbBtnRetest.addEventListener("click", setScenarioRetest);
-
-    const wbBtnEvidence = document.getElementById("wb-btn-evidence");
-    if (wbBtnEvidence) wbBtnEvidence.addEventListener("click", function() { openDrawer(state.currentReportId); });
-
-    // 6. Provenance Page Buttons
+    // 10. Provenance Page Buttons
     const btnProvTamper = document.getElementById("btn-prov-tamper");
     if (btnProvTamper) btnProvTamper.addEventListener("click", setScenarioTamper);
 
@@ -663,14 +1098,62 @@
       });
     }
 
-    // 7. Copy Buttons
+    // 11. Header Badges as Functional Navigators
+    if (el.badgeAiModel) {
+      el.badgeAiModel.style.cursor = "pointer";
+      el.badgeAiModel.addEventListener("click", function() {
+        openDrawer(state.currentReportId);
+        showToast("Inspecting Active Model Artifact Identity & Hash.", false);
+      });
+    }
+
+    if (el.badgeConnectivity) {
+      el.badgeConnectivity.style.cursor = "pointer";
+      el.badgeConnectivity.addEventListener("click", function() {
+        if (state.connectivity === "ONLINE") {
+          setScenarioOffline();
+        } else {
+          setScenarioReconnect();
+        }
+      });
+    }
+
+    if (el.badgeProvenance) {
+      el.badgeProvenance.style.cursor = "pointer";
+      el.badgeProvenance.addEventListener("click", function() {
+        switchView("view-provenance");
+      });
+    }
+
+    if (el.filterPill) {
+      el.filterPill.style.cursor = "pointer";
+      el.filterPill.addEventListener("click", function() {
+        if (state.streamMode.indexOf("Live") !== -1) {
+          state.streamMode = "Benchmark Replay • Physical CWRU Stream";
+        } else {
+          state.streamMode = "Live Telemetry • Flight-Line Stream";
+        }
+        const span = el.filterPill.querySelector("span");
+        if (span) span.textContent = state.streamMode;
+        showToast(`Stream switched to: ${state.streamMode}`, false);
+      });
+    }
+
+    if (el.txtEngineSub) {
+      el.txtEngineSub.style.cursor = "pointer";
+      el.txtEngineSub.addEventListener("click", function() {
+        switchView("view-passport");
+      });
+    }
+
+    // 12. Copy Buttons (Delegation with Visual Feedback)
     document.addEventListener("click", function(e) {
       if (e.target && e.target.classList.contains("btn-copy")) {
         const targetId = e.target.getAttribute("data-target");
         if (targetId) {
           const targetEl = document.getElementById(targetId);
           if (targetEl) {
-            copyTextToClipboard(targetEl.textContent.trim());
+            copyTextToClipboard(targetEl.textContent.trim(), e.target);
           }
         }
       }
@@ -682,20 +1165,31 @@
       }
     });
 
-    // Alert row click opens drawer
+    // Alert rows click
     const alertRows = document.querySelectorAll(".clickable-alert-row");
     alertRows.forEach(function(row) {
       row.addEventListener("click", function() {
-        openDrawer(state.currentReportId);
+        openDrawer("rep-demo-002");
       });
     });
 
-    const btnOpenAlertsEvidence = document.getElementById("btn-open-alerts-evidence");
-    if (btnOpenAlertsEvidence) {
-      btnOpenAlertsEvidence.addEventListener("click", function() {
-        switchView("view-provenance");
+    // Passport table rows click
+    const passportRows = document.querySelectorAll("#tbl-passport-full tr");
+    passportRows.forEach(function(row) {
+      row.style.cursor = "pointer";
+      row.addEventListener("click", function(e) {
+        if (e.target.tagName !== "BUTTON") {
+          const btn = row.querySelector(".btn-drawer-event");
+          if (btn) {
+            const repId = btn.getAttribute("data-rep");
+            openDrawer(repId);
+          }
+        }
       });
-    }
+    });
+
+    // 13. Initialize Chart Tooltips
+    setupChartTooltips();
   }
 
   // =========================================================================
@@ -704,7 +1198,7 @@
   setupEventListeners();
   render();
 
-  // Try fetching live /health from local WSGI server if available
+  // Automatic live sync with local WSGI server when served over HTTP
   if (typeof window !== "undefined" && window.fetch) {
     fetch("/health").then(function(res) {
       return res.json();
@@ -714,7 +1208,7 @@
         render();
       }
     }).catch(function() {
-      // Running standalone offline via file:// protocol
+      // Standalone mode via file:// protocol
     });
   }
 })();

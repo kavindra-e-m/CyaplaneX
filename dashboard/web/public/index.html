@@ -160,7 +160,7 @@
           <!-- Top 5 KPI Cards -->
           <section class="kpi-row" aria-label="Key Performance Indicators">
             <!-- KPI 1: System Status -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="card-kpi-status" tabindex="0" role="button" title="Click to view Diagnostic Evidence in Drawer">
               <div class="kpi-header">
                 <span class="kpi-label">System Status</span>
                 <div class="kpi-icon" id="icon-sys-status">
@@ -176,7 +176,7 @@
             </div>
 
             <!-- KPI 2: Health Score -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="card-kpi-health" tabindex="0" role="button" title="Click to inspect Health Score Calculation">
               <div class="kpi-header">
                 <span class="kpi-label">Health Score</span>
                 <div class="kpi-icon">
@@ -192,7 +192,7 @@
             </div>
 
             <!-- KPI 3: Failure Probability -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="card-kpi-risk" tabindex="0" role="button" title="Click to view Failure Risk in Evidence Drawer">
               <div class="kpi-header">
                 <span class="kpi-label">Failure Risk (30-Day)</span>
                 <div class="kpi-icon">
@@ -208,7 +208,7 @@
             </div>
 
             <!-- KPI 4: Maintenance Priority -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="card-kpi-priority" tabindex="0" role="button" title="Click to open MRO Maintenance Workbench">
               <div class="kpi-header">
                 <span class="kpi-label">Maintenance Priority</span>
                 <div class="kpi-icon">
@@ -224,7 +224,7 @@
             </div>
 
             <!-- KPI 5: Active Alerts -->
-            <div class="kpi-card">
+            <div class="kpi-card" id="card-kpi-alerts" tabindex="0" role="button" title="Click to view Alerts and Cryptographic Evidence">
               <div class="kpi-header">
                 <span class="kpi-label">Active Alerts</span>
                 <div class="kpi-icon">
@@ -677,7 +677,7 @@
                   <div class="legend-item"><span class="legend-line line-gray"></span> Threshold (0.80g)</div>
                 </div>
               </div>
-              <div class="chart-canvas-box">
+              <div class="chart-canvas-box" id="box-chart-vib">
                 <svg id="svg-chart-vibration" width="100%" height="100%" viewBox="0 0 500 180" preserveAspectRatio="none">
                   <!-- Grid Lines -->
                   <line x1="0" y1="45" x2="500" y2="45" stroke="#F1F5F9" stroke-width="1"/>
@@ -688,6 +688,7 @@
                   <!-- Vibration Curve -->
                   <path id="path-chart-vib" d="M 0,135 Q 80,130 160,132 T 320,135 L 360,50 L 400,48 L 440,135 L 500,135" fill="none" stroke="var(--accent-orange)" stroke-width="2.5"/>
                 </svg>
+                <div class="chart-tooltip" id="tooltip-vib"></div>
               </div>
             </div>
 
@@ -703,7 +704,7 @@
                   <div class="legend-item"><span class="legend-line line-gray"></span> Warning (65.0°C)</div>
                 </div>
               </div>
-              <div class="chart-canvas-box">
+              <div class="chart-canvas-box" id="box-chart-temp">
                 <svg id="svg-chart-temp" width="100%" height="100%" viewBox="0 0 500 180" preserveAspectRatio="none">
                   <!-- Grid Lines -->
                   <line x1="0" y1="45" x2="500" y2="45" stroke="#F1F5F9" stroke-width="1"/>
@@ -714,6 +715,7 @@
                   <!-- Temperature Curve -->
                   <path id="path-chart-temp" d="M 0,140 Q 150,110 300,105 T 500,102" fill="none" stroke="#D97706" stroke-width="2.5"/>
                 </svg>
+                <div class="chart-tooltip" id="tooltip-temp"></div>
               </div>
             </div>
           </section>
@@ -826,7 +828,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr class="clickable-row" id="st-row-vib" title="Click to inspect ADXL345 Vibration Telemetry in Drawer">
                     <td>
                       <div style="font-weight: 600;">vib-phys-01</div>
                       <div class="sensor-meta">ADXL345 3-Axis Accelerometer (&plusmn;16g)</div>
@@ -838,7 +840,7 @@
                     <td class="mono-hash">1.00</td>
                     <td><span class="trust-badge-pill trusted" id="st-vib-trust">TRUSTED</span></td>
                   </tr>
-                  <tr>
+                  <tr class="clickable-row" id="st-row-temp" title="Click to inspect MAX6675 Temperature Telemetry in Drawer">
                     <td>
                       <div style="font-weight: 600;">temp-phys-01</div>
                       <div class="sensor-meta">MAX6675 Cold-Junction Thermocouple</div>
@@ -850,7 +852,7 @@
                     <td class="mono-hash">1.00</td>
                     <td><span class="trust-badge-pill trusted">TRUSTED</span></td>
                   </tr>
-                  <tr>
+                  <tr class="clickable-row" id="st-row-rpm" title="Click to inspect A3144 Hall-Effect RPM Telemetry in Drawer">
                     <td>
                       <div style="font-weight: 600;">rpm-phys-01</div>
                       <div class="sensor-meta">A3144 Hall-Effect Digital Switch</div>
@@ -1179,10 +1181,10 @@
         <div class="evidence-section-card">
           <div class="evidence-section-title">Closed-Loop Repair Verification</div>
           <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-            <div><span class="sensor-meta">Mechanical Action:</span> <div style="font-weight: 600;">Replaced thrust bearing; torqued mountings to 45 Nm</div></div>
-            <div><span class="sensor-meta">Post-Repair Health Score:</span> <div style="font-weight: 700; color: var(--status-success);">100.0% (Pre-repair: 7.7%)</div></div>
-            <div><span class="sensor-meta">Repair Effectiveness:</span> <div style="font-weight: 700; color: var(--status-success);">0.92 (Threshold: &ge; 0.80) &rarr; REPAIR_VERIFIED</div></div>
-            <div><span class="sensor-meta">Closure Record ID:</span> <div class="mono-hash">clo-1fc447c2 (Added to Component Passport)</div></div>
+            <div><span class="sensor-meta">Mechanical Action:</span> <div style="font-weight: 600;" id="drw-repair-action">Replaced thrust bearing; torqued mountings to 45 Nm</div></div>
+            <div><span class="sensor-meta">Post-Repair Health Score:</span> <div style="font-weight: 700; color: var(--status-success);" id="drw-post-health">100.0% (Pre-repair: 7.7%)</div></div>
+            <div><span class="sensor-meta">Repair Effectiveness:</span> <div style="font-weight: 700; color: var(--status-success);" id="drw-eff">0.92 (Threshold: &ge; 0.80) &rarr; REPAIR_VERIFIED</div></div>
+            <div><span class="sensor-meta">Closure Record ID:</span> <div class="mono-hash" id="drw-closure-id">clo-1fc447c2 (Added to Component Passport)</div></div>
           </div>
         </div>
       </div>
