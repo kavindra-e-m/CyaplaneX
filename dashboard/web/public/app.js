@@ -625,9 +625,18 @@
       if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(record.rpmMean).toLocaleString()} rpm`;
       if (el.drwRpmStd) el.drwRpmStd.textContent = `${record.rpmStd.toFixed(1)} rpm`;
 
-      if (el.drwModhash) el.drwModhash.textContent = record.modelHash;
-      if (el.drwWinhash) el.drwWinhash.textContent = record.windowHash;
-      if (el.drwSig) el.drwSig.textContent = record.signature;
+      if (el.drwModhash) {
+        el.drwModhash.textContent = record.modelHash;
+        el.drwModhash.title = record.modelHash;
+      }
+      if (el.drwWinhash) {
+        el.drwWinhash.textContent = record.windowHash;
+        el.drwWinhash.title = record.windowHash;
+      }
+      if (el.drwSig) {
+        el.drwSig.textContent = record.signature;
+        el.drwSig.title = record.signature;
+      }
 
       if (el.drwBadgeProv) {
         const isViolation = (targetId === "rep-demo-002" && state.provenanceStatus === "PROVENANCE_VIOLATION");
@@ -653,6 +662,19 @@
       if (el.drwTempMax) el.drwTempMax.textContent = `${state.temperatureMax.toFixed(1)} °C`;
       if (el.drwRpmMean) el.drwRpmMean.textContent = `${Math.round(state.rpmMean).toLocaleString()} rpm`;
       if (el.drwRpmStd) el.drwRpmStd.textContent = `${state.rpmStd.toFixed(1)} rpm`;
+
+      if (el.drwModhash) {
+        el.drwModhash.textContent = state.modelHash;
+        el.drwModhash.title = state.modelHash;
+      }
+      if (el.drwWinhash) {
+        el.drwWinhash.textContent = state.windowHash;
+        el.drwWinhash.title = state.windowHash;
+      }
+      if (el.drwSig) {
+        el.drwSig.textContent = state.signature;
+        el.drwSig.title = state.signature;
+      }
 
       if (el.drwBadgeProv) {
         el.drwBadgeProv.textContent = state.provenanceStatus === "PROVENANCE_VERIFIED" ? "VERIFIED" : "PROVENANCE VIOLATION";

@@ -91,6 +91,7 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 button {
@@ -826,6 +827,8 @@ a {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 /* ==========================================================================
@@ -993,13 +996,14 @@ a {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 520px;
-  max-width: 90vw;
+  width: 480px;
+  max-width: 100vw;
   background-color: #FFFFFF;
   box-shadow: var(--shadow-drawer);
   z-index: 101;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1046,9 +1050,11 @@ a {
 .drawer-body {
   padding: 24px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
 }
 
 .evidence-section-card {
@@ -1056,6 +1062,9 @@ a {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 16px;
+  min-width: 0;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .evidence-section-title {
@@ -1074,15 +1083,30 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   background-color: #FFFFFF;
   border: 1px solid var(--border-subtle);
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 11px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hash-copy-row span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .btn-copy {
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 4px 10px;
   font-size: 11px;
   font-weight: 600;
